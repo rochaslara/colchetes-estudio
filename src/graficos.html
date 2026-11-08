@@ -65,7 +65,11 @@ details.sec[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
 .sum-t{display:grid;gap:1px;min-width:0}
 .sum-t b{font-family:var(--display);font-weight:400;font-size:17px;line-height:1.2}
 .sum-t small{font-size:12.5px;color:var(--muted)}
-.more-head{padding:22px 20px 6px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.adjust{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.adjust-head{padding:12px 14px;font-size:13px;font-weight:600;border-bottom:1px solid var(--line);background:var(--sunk)}
+.adjust details.sec:last-child{border-bottom:0}
+.adjust details.sec>summary{padding:12px 14px}
+.adjust .sec-body{padding:0 14px 16px}
 details.sec.minor>summary{padding:13px 20px}
 details.sec.minor .sum-t b{font-family:var(--ui);font-size:14.5px;font-weight:500}
 .sec-body{padding:0 20px 22px;display:grid;gap:14px}
@@ -170,15 +174,8 @@ table.data .dim{opacity:.4}
     </section>
 
     <aside class="panel" id="panel">
-      <details class="sec" open>
-        <summary><span class="num">1</span><span class="sum-t"><b>Tipo de gráfico</b><small>Clique para trocar. Seus dados continuam.</small></span></summary>
-        <div class="sec-body">
-          <div class="types" id="types"></div>
-        </div>
-      </details>
-
       <details class="sec" open id="dataSec">
-        <summary><span class="num">2</span><span class="sum-t"><b>Dados</b><small>Digite os números ou cole de uma planilha</small></span></summary>
+        <summary><span class="num">1</span><span class="sum-t"><b>Dados e ajustes</b><small>Seus números e o formato do gráfico</small></span></summary>
         <div class="sec-body">
           <div data-types="gauge" class="sec-body" style="padding:0">
             <div class="row3">
@@ -209,6 +206,107 @@ table.data .dim{opacity:.4}
               <div class="tools"><button class="btn small primary" id="pasteBtn" type="button">Usar estes dados</button></div>
             </div>
           </div>
+          <div class="adjust">
+            <div class="adjust-head">Ajustes do gráfico</div>
+          <details class="sec minor">
+            <summary><span class="sum-t"><b>Formato das barras e fatias</b></span></summary>
+            <div class="sec-body">
+              <div class="field" data-types="leaf grouped"><span>Cantos das barras</span>
+                <div class="seg">
+                  <label><input type="radio" name="corner" value="leaf" data-k="corner"><span>Folha</span></label>
+                  <label><input type="radio" name="corner" value="top" data-k="corner"><span>Arredondado</span></label>
+                  <label><input type="radio" name="corner" value="pill" data-k="corner"><span>Redondo</span></label>
+                  <label><input type="radio" name="corner" value="square" data-k="corner"><span>Reto</span></label>
+                </div>
+              </div>
+              <label class="field" data-types="leaf grouped"><span>Tamanho da curva <output data-o="radius"></output></span><input type="range" id="f-rad" data-k="radius" min="0" max="0.5" step="0.01"></label>
+              <label class="field" data-types="leaf"><span>Espaço entre as barras <output data-o="gap"></output></span><input type="range" id="f-gap" data-k="gap" min="0" max="0.6" step="0.01"></label>
+              <label class="field" data-types="grouped"><span>Espaço entre os grupos <output data-o="groupGap"></output></span><input type="range" id="f-ggap" data-k="groupGap" min="0" max="0.7" step="0.01"></label>
+              <label class="field" data-types="capsules"><span>Espaço entre as cápsulas <output data-o="capGap"></output></span><input type="range" id="f-cgap" data-k="capGap" min="0.1" max="0.6" step="0.01"></label>
+              <div class="field" data-types="leaf"><span>Onde ficam os números</span>
+                <div class="seg">
+                  <label><input type="radio" name="valueStyle" value="header" data-k="valueStyle"><span>Grandes, no topo</span></label>
+                  <label><input type="radio" name="valueStyle" value="inside" data-k="valueStyle"><span>Dentro da barra</span></label>
+                  <label><input type="radio" name="valueStyle" value="above" data-k="valueStyle"><span>Em cima da barra</span></label>
+                </div>
+              </div>
+              <div class="field" data-types="leaf"><span>Cores das barras</span>
+                <div class="seg">
+                  <label><input type="radio" name="colorBy" value="category" data-k="colorBy"><span>Uma cor para cada</span></label>
+                  <label><input type="radio" name="colorBy" value="series" data-k="colorBy"><span>Todas iguais</span></label>
+                </div>
+              </div>
+              <div class="field" data-types="pills"><span>Estilo</span>
+                <div class="seg">
+                  <label><input type="radio" name="pillStyle" value="outlined" data-k="pillStyle"><span>Uma dentro da outra</span></label>
+                  <label><input type="radio" name="pillStyle" value="flush" data-k="pillStyle"><span>Lado a lado</span></label>
+                </div>
+              </div>
+              <label class="field" data-types="pills"><span>Altura das barras <output data-o="pillSize"></output></span><input type="range" id="f-psz" data-k="pillSize" min="4" max="20" step="0.5"></label>
+              <label class="field" data-types="donut"><span>Espessura do anel <output data-o="thick"></output></span><input type="range" id="f-th" data-k="thick" min="0.1" max="0.8" step="0.01"></label>
+              <label class="field" data-types="gauge"><span>Espessura do arco <output data-o="gthick"></output></span><input type="range" id="f-gth" data-k="gthick" min="0.01" max="0.2" step="0.005"></label>
+              <label class="field" data-types="donut pie"><span>Girar <output data-o="rotation"></output></span><input type="range" id="f-rot" data-k="rotation" min="-180" max="180" step="5"></label>
+              <div class="checks">
+                <label class="check" data-types="leaf"><input type="checkbox" id="c-rules" data-k="rules">Linhas entre colunas</label>
+                <label class="check" data-types="leaf grouped capsules pills pie"><input type="checkbox" id="c-vals" data-k="showValues">Mostrar números</label>
+                <label class="check" data-types="capsules pills"><input type="checkbox" id="c-cat" data-k="showCategory">Mostrar nomes</label>
+                <label class="check" data-types="grouped"><input type="checkbox" id="c-axis" data-k="showAxis">Escala de valores</label>
+                <label class="check" data-types="grouped line"><input type="checkbox" id="c-grid" data-k="grid">Linhas de grade</label>
+                <label class="check" data-types="leaf grouped capsules pills donut pie line"><input type="checkbox" id="c-leg" data-k="showLegend">Legenda</label>
+                <label class="check" data-types="donut"><input type="checkbox" id="c-caps" data-k="roundCaps">Pontas redondas</label>
+                <label class="check" data-types="pie donut"><input type="checkbox" id="c-sort" data-k="sortDesc">Maior primeiro</label>
+                <label class="check" data-types="line"><input type="checkbox" id="c-sum" data-k="showSummary">Valor em destaque</label>
+                <label class="check" data-types="line"><input type="checkbox" id="c-area" data-k="area">Preencher área</label>
+                <label class="check" data-types="gauge"><input type="checkbox" id="c-ul" data-k="underline">Sublinhar número</label>
+              </div>
+            </div>
+          </details>
+
+          <details class="sec minor">
+            <summary><span class="sum-t"><b>Letras e números</b></span></summary>
+            <div class="sec-body">
+              <div class="field"><span>Fonte de destaque (títulos e números grandes)</span>
+                <div class="seg">
+                  <label><input type="radio" name="serif" value="Newsreader" data-k="serif"><span class="f-hl">Newsreader</span></label>
+                  <label><input type="radio" name="serif" value="Tenor Sans" data-k="serif"><span class="f-tenor">Tenor Sans</span></label>
+                </div>
+              </div>
+              <p class="hint">Os demais textos usam DM Sans.</p>
+              <label class="field" id="weightField"><span>Peso da Newsreader <output data-o="serifWeight"></output></span><input type="range" id="f-sw" data-k="serifWeight" min="200" max="700" step="50"></label>
+              <label class="field"><span>Tamanho dos textos <output data-o="typeScale"></output></span><input type="range" id="f-ts" data-k="typeScale" min="0.6" max="1.6" step="0.05"></label>
+              <div class="row3">
+                <label class="field"><span>Antes do número</span><input type="text" id="f-pre" data-k="prefix" placeholder="R$ "></label>
+                <label class="field"><span>Depois do número</span><input type="text" id="f-suf" data-k="suffix" placeholder="%"></label>
+                <label class="field"><span>Casas decimais</span><input type="number" id="f-dec" data-k="decimals" min="0" max="4" step="1"></label>
+              </div>
+              <div class="field"><span>Formato dos números</span>
+                <div class="seg">
+                  <label><input type="radio" name="locale" value="pt-BR" data-k="locale"><span>Brasil · 1.234,5</span></label>
+                  <label><input type="radio" name="locale" value="en-US" data-k="locale"><span>EUA · 1,234.5</span></label>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="sec minor">
+            <summary><span class="sum-t"><b>Tamanho e margens</b></span></summary>
+            <div class="sec-body">
+              <div class="row2">
+                <label class="field"><span>Largura (px)</span><input type="number" id="f-w" data-k="w" min="200" max="6000" step="10"></label>
+                <label class="field"><span>Altura (px)</span><input type="number" id="f-h" data-k="h" min="200" max="6000" step="10"></label>
+              </div>
+              <label class="field"><span>Margem <output data-o="padding"></output></span><input type="range" id="f-pad" data-k="padding" min="0" max="18" step="0.5"></label>
+              <label class="check"><input type="checkbox" id="c-frame" data-k="frame">Contorno de cartão</label>
+            </div>
+          </details>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary><span class="num">2</span><span class="sum-t"><b>Tipo de gráfico</b><small>Clique para trocar. Seus dados continuam.</small></span></summary>
+        <div class="sec-body">
+          <div class="types" id="types"></div>
         </div>
       </details>
 
@@ -282,100 +380,6 @@ table.data .dim{opacity:.4}
           <p class="hint" id="exportInfo"></p>
           <button class="btn primary big" id="exportBtn" type="button">Baixar imagem (PNG)</button>
           <div class="tools"><button class="btn small" id="copyBtn" type="button">Copiar imagem</button><button class="btn small" id="dupBtn" type="button">Duplicar gráfico</button><button class="btn small danger" id="delBtn" type="button">Apagar gráfico</button></div>
-        </div>
-      </details>
-
-      <div class="more-head">Mais ajustes (opcional)</div>
-
-      <details class="sec minor">
-        <summary><span class="sum-t"><b>Formato das barras e fatias</b></span></summary>
-        <div class="sec-body">
-          <div class="field" data-types="leaf grouped"><span>Cantos das barras</span>
-            <div class="seg">
-              <label><input type="radio" name="corner" value="leaf" data-k="corner"><span>Folha</span></label>
-              <label><input type="radio" name="corner" value="top" data-k="corner"><span>Arredondado</span></label>
-              <label><input type="radio" name="corner" value="pill" data-k="corner"><span>Redondo</span></label>
-              <label><input type="radio" name="corner" value="square" data-k="corner"><span>Reto</span></label>
-            </div>
-          </div>
-          <label class="field" data-types="leaf grouped"><span>Tamanho da curva <output data-o="radius"></output></span><input type="range" id="f-rad" data-k="radius" min="0" max="0.5" step="0.01"></label>
-          <label class="field" data-types="leaf"><span>Espaço entre as barras <output data-o="gap"></output></span><input type="range" id="f-gap" data-k="gap" min="0" max="0.6" step="0.01"></label>
-          <label class="field" data-types="grouped"><span>Espaço entre os grupos <output data-o="groupGap"></output></span><input type="range" id="f-ggap" data-k="groupGap" min="0" max="0.7" step="0.01"></label>
-          <label class="field" data-types="capsules"><span>Espaço entre as cápsulas <output data-o="capGap"></output></span><input type="range" id="f-cgap" data-k="capGap" min="0.02" max="0.6" step="0.01"></label>
-          <div class="field" data-types="leaf"><span>Onde ficam os números</span>
-            <div class="seg">
-              <label><input type="radio" name="valueStyle" value="header" data-k="valueStyle"><span>Grandes, no topo</span></label>
-              <label><input type="radio" name="valueStyle" value="inside" data-k="valueStyle"><span>Dentro da barra</span></label>
-              <label><input type="radio" name="valueStyle" value="above" data-k="valueStyle"><span>Em cima da barra</span></label>
-            </div>
-          </div>
-          <div class="field" data-types="leaf"><span>Cores das barras</span>
-            <div class="seg">
-              <label><input type="radio" name="colorBy" value="category" data-k="colorBy"><span>Uma cor para cada</span></label>
-              <label><input type="radio" name="colorBy" value="series" data-k="colorBy"><span>Todas iguais</span></label>
-            </div>
-          </div>
-          <div class="field" data-types="pills"><span>Estilo</span>
-            <div class="seg">
-              <label><input type="radio" name="pillStyle" value="outlined" data-k="pillStyle"><span>Uma dentro da outra</span></label>
-              <label><input type="radio" name="pillStyle" value="flush" data-k="pillStyle"><span>Lado a lado</span></label>
-            </div>
-          </div>
-          <label class="field" data-types="pills"><span>Altura das barras <output data-o="pillSize"></output></span><input type="range" id="f-psz" data-k="pillSize" min="4" max="20" step="0.5"></label>
-          <label class="field" data-types="donut"><span>Espessura do anel <output data-o="thick"></output></span><input type="range" id="f-th" data-k="thick" min="0.1" max="0.8" step="0.01"></label>
-          <label class="field" data-types="gauge"><span>Espessura do arco <output data-o="gthick"></output></span><input type="range" id="f-gth" data-k="gthick" min="0.01" max="0.2" step="0.005"></label>
-          <label class="field" data-types="donut pie"><span>Girar <output data-o="rotation"></output></span><input type="range" id="f-rot" data-k="rotation" min="-180" max="180" step="5"></label>
-          <div class="checks">
-            <label class="check" data-types="leaf"><input type="checkbox" id="c-rules" data-k="rules">Linhas entre colunas</label>
-            <label class="check" data-types="leaf grouped capsules pills pie"><input type="checkbox" id="c-vals" data-k="showValues">Mostrar números</label>
-            <label class="check" data-types="capsules pills"><input type="checkbox" id="c-cat" data-k="showCategory">Mostrar nomes</label>
-            <label class="check" data-types="grouped"><input type="checkbox" id="c-axis" data-k="showAxis">Escala de valores</label>
-            <label class="check" data-types="grouped line"><input type="checkbox" id="c-grid" data-k="grid">Linhas de grade</label>
-            <label class="check" data-types="leaf grouped capsules pills donut pie line"><input type="checkbox" id="c-leg" data-k="showLegend">Legenda</label>
-            <label class="check" data-types="donut"><input type="checkbox" id="c-caps" data-k="roundCaps">Pontas redondas</label>
-            <label class="check" data-types="pie donut"><input type="checkbox" id="c-sort" data-k="sortDesc">Maior primeiro</label>
-            <label class="check" data-types="line"><input type="checkbox" id="c-sum" data-k="showSummary">Valor em destaque</label>
-            <label class="check" data-types="line"><input type="checkbox" id="c-area" data-k="area">Preencher área</label>
-            <label class="check" data-types="gauge"><input type="checkbox" id="c-ul" data-k="underline">Sublinhar número</label>
-          </div>
-        </div>
-      </details>
-
-      <details class="sec minor">
-        <summary><span class="sum-t"><b>Letras e números</b></span></summary>
-        <div class="sec-body">
-          <div class="field"><span>Fonte de destaque (títulos e números grandes)</span>
-            <div class="seg">
-              <label><input type="radio" name="serif" value="Newsreader" data-k="serif"><span class="f-hl">Newsreader</span></label>
-              <label><input type="radio" name="serif" value="Tenor Sans" data-k="serif"><span class="f-tenor">Tenor Sans</span></label>
-            </div>
-          </div>
-          <p class="hint">Os demais textos usam DM Sans.</p>
-          <label class="field" id="weightField"><span>Peso da Newsreader <output data-o="serifWeight"></output></span><input type="range" id="f-sw" data-k="serifWeight" min="200" max="700" step="50"></label>
-          <label class="field"><span>Tamanho dos textos <output data-o="typeScale"></output></span><input type="range" id="f-ts" data-k="typeScale" min="0.6" max="1.6" step="0.05"></label>
-          <div class="row3">
-            <label class="field"><span>Antes do número</span><input type="text" id="f-pre" data-k="prefix" placeholder="R$ "></label>
-            <label class="field"><span>Depois do número</span><input type="text" id="f-suf" data-k="suffix" placeholder="%"></label>
-            <label class="field"><span>Casas decimais</span><input type="number" id="f-dec" data-k="decimals" min="0" max="4" step="1"></label>
-          </div>
-          <div class="field"><span>Formato dos números</span>
-            <div class="seg">
-              <label><input type="radio" name="locale" value="pt-BR" data-k="locale"><span>Brasil · 1.234,5</span></label>
-              <label><input type="radio" name="locale" value="en-US" data-k="locale"><span>EUA · 1,234.5</span></label>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <details class="sec minor">
-        <summary><span class="sum-t"><b>Tamanho e margens</b></span></summary>
-        <div class="sec-body">
-          <div class="row2">
-            <label class="field"><span>Largura (px)</span><input type="number" id="f-w" data-k="w" min="200" max="6000" step="10"></label>
-            <label class="field"><span>Altura (px)</span><input type="number" id="f-h" data-k="h" min="200" max="6000" step="10"></label>
-          </div>
-          <label class="field"><span>Margem <output data-o="padding"></output></span><input type="range" id="f-pad" data-k="padding" min="0" max="18" step="0.5"></label>
-          <label class="check"><input type="checkbox" id="c-frame" data-k="frame">Contorno de cartão</label>
         </div>
       </details>
     </aside>
@@ -752,7 +756,7 @@ DRAW.grouped = (ctx,c,P,b,u) => {
 DRAW.capsules = (ctx,c,P,b,u) => {
   const R = parsedRows(c); if (!R.length) return empty(ctx,c,P,b,u);
   const L = Math.max(1, Math.min(c.series.length, 3)), n = R.length;
-  const colW = b.w/n, capW = colW*(1-c.capGap);
+  const colW = b.w/n, capW = colW*(1-Math.max(0.1, c.capGap));
   const lab = 4.2*u, cat = 2.3*u;
   const top = b.y + (c.showValues ? lab*1.35 : 0);
   const base = b.y + b.h - (c.showCategory ? cat*1.3 + 2.4*u : 0);
@@ -761,14 +765,18 @@ DRAW.capsules = (ctx,c,P,b,u) => {
   R.forEach((r,i) => {
     const vals = r.v.slice(0,L).map(v=>v||0).sort((a,b)=>b-a);
     const cx = b.x + i*colW + (colW-capW)/2;
-    let outerTop = base;
+    // each layer sits fully inside the one around it, with the same gap on every side
+    const g = capW*0.075;
+    let outerTop = base, prev = null;
     vals.forEach((v,k) => {
-      const inset = k*capW*0.09, w = capW - 2*inset;
+      const x = prev ? prev.x + g : cx, w = prev ? prev.w - 2*g : capW, yBot = prev ? prev.bot - g : base;
       if (w <= 0) return;
-      let yTop = base - v/max*ph; const yBot = base - inset;
+      let yTop = base - v/max*ph;
+      if (prev) yTop = Math.max(yTop, prev.top + g);
       if (yBot - yTop < w) yTop = yBot - w;
       if (k===0) outerTop = yTop;
-      ctx.fillStyle = col(c,P,k); pill(ctx, cx+inset, yTop, w, yBot-yTop); ctx.fill();
+      ctx.fillStyle = col(c,P,k); pill(ctx, x, yTop, w, yBot-yTop); ctx.fill();
+      prev = { x, w, top:yTop, bot:yBot };
     });
     if (c.showValues){
       const txt = r.t || fmt(vals[0]||0, c);
@@ -798,14 +806,19 @@ DRAW.pills = (ctx,c,P,b,u) => {
   R.forEach((r,i) => {
     const y = y0 + i*(pillH+gapY);
     const vals = r.v.slice(0,L).map(v=>v||0).sort((a,b)=>b-a);
-    const ends = [];
+    const ends = [], inset = c.pillStyle==='outlined';
+    const g = pillH*0.095;
+    let prev = null;
     vals.forEach((v,k) => {
-      const inset = c.pillStyle==='outlined' ? k*pillH*0.095 : 0;
-      const h = pillH - 2*inset; if (h <= 0) return;
-      const len = Math.max(pillH, v/max*plotW);
-      const w = Math.max(h, len - inset*2 + (k?0:0));
-      ctx.fillStyle = col(c,P,k); pill(ctx, x0 + inset, y + inset, w, h); ctx.fill();
-      ends.push({ end:x0 + inset + w, h, v });
+      const d = inset && prev ? g : 0;
+      const x = prev ? prev.x + d : x0, top = prev ? prev.y + d : y, h = prev ? prev.h - 2*d : pillH;
+      if (h <= 0) return;
+      let end = x0 + Math.max(pillH, v/max*plotW);
+      if (inset && prev) end = Math.min(end, prev.end - g);
+      if (end - x < h) end = x + h;
+      ctx.fillStyle = col(c,P,k); pill(ctx, x, top, end - x, h); ctx.fill();
+      ends.push({ end, h, v });
+      prev = { x, y:top, h, end };
     });
     if (c.showValues){
       ctx.font = sansF(c,numS,600); ctx.fillStyle = P.ink; ctx.textAlign = 'center';
@@ -994,7 +1007,8 @@ function load(){
     const s = JSON.parse(localStorage.getItem(KEY));
     if (s && Array.isArray(s.charts) && s.charts.length){
       s.charts = s.charts.map(c => { const d = base(); const o = Object.assign(d, c, { gauge:Object.assign(d.gauge, c.gauge), kpi:Object.assign(d.kpi, c.kpi) });
-        o.sans = 'DM Sans'; if (o.serif !== 'Tenor Sans') o.serif = 'Newsreader'; if (o.exportScale === 3) o.exportScale = 2; return o; });
+        o.sans = 'DM Sans'; if (o.serif !== 'Tenor Sans') o.serif = 'Newsreader'; if (o.exportScale === 3) o.exportScale = 2;
+        if (o.type === 'capsules' && (o.palette === 'navy' || o.palette === 'sky')) { o.palette = 'forest'; o.colors = []; o.ink = ''; } return o; });
       if (!s.charts.find(c=>c.id===s.current)) s.current = s.charts[0].id;
       return s;
     }
@@ -1153,17 +1167,21 @@ function buildTypes(){
 typesEl.addEventListener('click', e => {
   const b = e.target.closest('.type'); if (!b) return;
   const c = cur(); if (c.type === b.dataset.type) return;
-  c.type = b.dataset.type;
+  c.type = b.dataset.type; fixPalette(c);
   if ((c.type === 'gauge' || c.type === 'kpi') && !c.rows.length) {}
   save(); syncAll(); redraw(); refreshChip();
 });
 
 /* palettes */
+// color sets that don't work for a chart type are not offered for it
+const HIDDEN_PALS = { capsules:['navy','sky'] };
+function fixPalette(c){ if ((HIDDEN_PALS[c.type]||[]).includes(c.palette)){ c.palette = 'forest'; c.colors = []; c.ink = ''; } }
 const palsEl = document.getElementById('pals');
 function buildPals(){
   const c = cur();
   palsEl.innerHTML = '';
   Object.entries(PALETTES).forEach(([id,p]) => {
+    if ((HIDDEN_PALS[c.type]||[]).includes(id)) return;
     const b = document.createElement('button'); b.type = 'button'; b.className = 'pal'; b.dataset.pal = id;
     b.setAttribute('aria-pressed', c.palette === id ? 'true' : 'false');
     const sw = document.createElement('div'); sw.className = 'sw'; sw.style.background = p.bg; sw.style.boxShadow = 'inset 0 0 0 1px rgba(0,0,0,.06)';
