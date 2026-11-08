@@ -1,27 +1,27 @@
-<title>Chart Atelier</title>
+<title>Gráficos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..700&family=Instrument+Serif&family=Gloock&family=Fraunces:opsz,wght@9..144,300..700&family=Instrument+Sans:wght@400..700&family=DM+Sans:opsz,wght@9..40,400..700&family=Manrope:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..700&family=Tenor+Sans&family=DM+Sans:opsz,wght@9..40,400..700&display=swap">
 <style>
-/* Layout: top bar with a shelf of saved charts · stage with the live canvas · control column on the right */
+/* Layout: chart list on top · big preview on the left · numbered steps on the right, extra settings folded away */
 :root{
   --bg:#F5EFE3; --surface:#FCF8F1; --sunk:#ECE4D3; --line:#DDD2BD; --ink:#121C4A; --muted:#5D6487;
-  --accent:#4174CC; --gold:#E8C36D; --on-ink:#FCF8F1; --danger:#B2452F;
-  --display:"Newsreader", Georgia, "Times New Roman", serif;
-  --ui:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --accent:#4174CC; --gold:#E8C36D; --on-ink:#FCF8F1; --danger:#B2452F; --step:#121C4A;
+  --display:"Tenor Sans", "Century Gothic", sans-serif;
+  --ui:"DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0B1335; --surface:#111B46; --sunk:#070E29; --line:#27336C; --ink:#F3EBDA; --muted:#A2A9C8;
-    --accent:#8AABDF; --gold:#E8C36D; --on-ink:#0B1335; --danger:#E58C77; color-scheme:dark;
+    --accent:#8AABDF; --gold:#E8C36D; --on-ink:#0B1335; --danger:#E58C77; --step:#E8C36D; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0B1335; --surface:#111B46; --sunk:#070E29; --line:#27336C; --ink:#F3EBDA; --muted:#A2A9C8;
-  --accent:#8AABDF; --gold:#E8C36D; --on-ink:#0B1335; --danger:#E58C77; color-scheme:dark;
+  --accent:#8AABDF; --gold:#E8C36D; --on-ink:#0B1335; --danger:#E58C77; --step:#E8C36D; color-scheme:dark;
 }
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--ui);-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font:14.5px/1.45 var(--ui);-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 button{font:inherit;color:inherit}
@@ -29,96 +29,115 @@ button{font:inherit;color:inherit}
 
 .app{height:100%;display:grid;grid-template-rows:auto 1fr;min-height:0}
 .top{display:flex;align-items:center;gap:16px;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--surface);min-width:0}
-.brand{font-family:var(--display);font-size:24px;font-weight:330;letter-spacing:-.015em;white-space:nowrap;line-height:1}
-.brand em{font-style:italic;color:var(--accent)}
+.brand{font-family:var(--display);font-size:22px;white-space:nowrap;line-height:1}
+.shelf-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.shelf-label{font-size:12px;color:var(--muted);white-space:nowrap}
 .shelf{display:flex;gap:8px;overflow-x:auto;flex:1;min-width:0;padding:4px 2px;scrollbar-width:thin}
-.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 12px 3px 3px;cursor:pointer;white-space:nowrap;font-size:13px;max-width:220px}
+.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 12px 3px 3px;cursor:pointer;white-space:nowrap;font-size:13.5px;max-width:220px}
 .chip span{overflow:hidden;text-overflow:ellipsis}
 .chip canvas{width:44px;height:28px;border-radius:999px;display:block;flex:none;background:var(--sunk)}
 .chip[aria-current="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .actions{display:flex;gap:8px;flex:none}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:500;font-size:13px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:500;font-size:14px;white-space:nowrap}
 .btn:hover{border-color:var(--ink)}
 .btn.primary{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .btn.primary:hover{opacity:.9}
 .btn.ghost{background:none}
 .btn.danger{color:var(--danger)}
-.btn.small{padding:4px 10px;font-size:12px}
-.btn svg{width:14px;height:14px}
+.btn.small{padding:5px 12px;font-size:13px}
+.btn.big{padding:12px 20px;font-size:15px;width:100%}
+.btn svg{width:15px;height:15px}
 
-.work{display:grid;grid-template-columns:minmax(0,1fr) 384px;min-height:0}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 400px;min-height:0}
 .stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;min-height:0;min-width:0;background:var(--sunk);overflow:hidden}
 .canvas-wrap{position:relative;line-height:0;box-shadow:0 1px 2px rgba(10,16,48,.10),0 18px 48px -18px rgba(10,16,48,.35)}
 .canvas-wrap.checker{background:conic-gradient(#d9d9d9 25%,#fff 0 50%,#d9d9d9 0 75%,#fff 0) 0 0/16px 16px}
 #view{display:block}
-.meta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:center}
+.meta{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:center}
 
 .panel{overflow-y:auto;border-left:1px solid var(--line);background:var(--surface);min-width:0}
 details.sec{border-bottom:1px solid var(--line)}
-details.sec>summary{padding:14px 20px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}
+details.sec>summary{padding:16px 20px;cursor:pointer;list-style:none;display:flex;gap:12px;align-items:center;user-select:none}
 details.sec>summary::-webkit-details-marker{display:none}
-details.sec>summary::after{content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);opacity:.6}
+details.sec>summary::after{content:"";margin-left:auto;width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);opacity:.6;flex:none}
 details.sec[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
-.sec-body{padding:0 20px 20px;display:grid;gap:14px}
+.num{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--step);color:var(--on-ink);font-size:13px;font-weight:600}
+.sum-t{display:grid;gap:1px;min-width:0}
+.sum-t b{font-family:var(--display);font-weight:400;font-size:17px;line-height:1.2}
+.sum-t small{font-size:12.5px;color:var(--muted)}
+.more-head{padding:22px 20px 6px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+details.sec.minor>summary{padding:13px 20px}
+details.sec.minor .sum-t b{font-family:var(--ui);font-size:14.5px;font-weight:500}
+.sec-body{padding:0 20px 22px;display:grid;gap:14px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .field{display:grid;gap:6px;min-width:0}
-.field>span,.lbl{font-size:12px;color:var(--muted)}
+.field>span,.lbl{font-size:13px;color:var(--muted)}
 .field>span output{float:right;color:var(--ink);font-variant-numeric:tabular-nums}
-input[type=text],input[type=number],select,textarea{width:100%;min-width:0;font:inherit;font-size:13.5px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
-textarea{resize:vertical;min-height:38px}
+input[type=text],input[type=number],select,textarea{width:100%;min-width:0;font:inherit;font-size:14.5px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 11px}
+textarea{resize:vertical;min-height:40px}
 input[type=range]{width:100%;accent-color:var(--ink)}
-input[type=color]{width:100%;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:2px;cursor:pointer}
-.seg{display:flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--bg)}
-.seg label{flex:1;position:relative;min-width:0}
+input[type=color]{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:2px;cursor:pointer}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:3px;background:var(--bg);gap:2px}
+.seg label{flex:1 1 auto;position:relative;min-width:0}
 .seg input{position:absolute;opacity:0;pointer-events:none}
-.seg span{display:block;text-align:center;padding:5px 6px;border-radius:999px;font-size:12.5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg span{display:block;text-align:center;padding:6px 8px;border-radius:9px;font-size:13.5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .seg input:checked+span{background:var(--ink);color:var(--on-ink)}
 .seg input:focus-visible+span{outline:2px solid var(--accent)}
-.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
-.check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
-.check input{accent-color:var(--ink);width:15px;height:15px}
-.hint{font-size:12px;color:var(--muted);margin:0}
+.seg span.f-hl{font-family:"Newsreader", Georgia, serif;font-size:15px}
+.seg span.f-tenor{font-family:"Tenor Sans","Century Gothic",sans-serif}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.check input{accent-color:var(--ink);width:16px;height:16px;flex:none}
+.hint{font-size:13px;color:var(--muted);margin:0;line-height:1.45}
+
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.type{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:6px 6px 8px;cursor:pointer;display:grid;gap:6px;text-align:center;font-size:12.5px;line-height:1.2}
+.type canvas{width:100%;aspect-ratio:16/10;display:block;border-radius:6px;background:var(--sunk)}
+.type:hover{border-color:var(--ink)}
+.type[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:600}
 
 .pals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .pal{border:1px solid var(--line);border-radius:10px;padding:6px;cursor:pointer;background:var(--bg);text-align:left;display:grid;gap:6px}
 .pal .sw{display:flex;height:26px;border-radius:6px;overflow:hidden;padding:4px;gap:3px}
 .pal .sw i{flex:1;border-radius:3px}
-.pal small{font-size:11.5px;padding:0 2px}
+.pal small{font-size:12px;padding:0 2px}
 .pal[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
 .slot{display:grid;gap:4px;min-width:0}
-.slot small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .tablewrap{overflow:auto;max-height:340px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-table.data{border-collapse:collapse;width:100%;font-size:13px}
+table.data{border-collapse:collapse;width:100%;font-size:14px;table-layout:fixed}
 table.data th,table.data td{border-bottom:1px solid var(--line);padding:0}
 table.data th{position:sticky;top:0;background:var(--sunk);z-index:1;text-align:left;font-weight:500}
-table.data input{border:0;border-radius:0;background:transparent;padding:7px 8px;min-width:64px;font-variant-numeric:tabular-nums}
+table.data input{border:0;border-radius:0;background:transparent;padding:8px 9px;width:100%;min-width:0;font-variant-numeric:tabular-nums;text-overflow:ellipsis}
 table.data input:focus{background:var(--surface);outline:2px solid var(--accent);outline-offset:-2px}
-table.data td.lab input{min-width:110px}
-table.data th input{font-weight:600;font-size:12px}
+table.data th:first-child{width:34%}table.data th:last-child{width:32px}
+table.data th input{font-weight:600;font-size:12.5px}
 table.data .dim{opacity:.4}
-.x{border:0;background:none;cursor:pointer;color:var(--muted);padding:6px 8px;line-height:1;font-size:15px}
+.x{border:0;background:none;cursor:pointer;color:var(--muted);padding:6px 8px;line-height:1;font-size:16px}
 .x:hover{color:var(--danger)}
 .th-wrap{display:flex;align-items:center}
 .tools{display:flex;flex-wrap:wrap;gap:8px}
+.paste-box{border:1px dashed var(--line);border-radius:10px;padding:12px;display:grid;gap:10px;background:var(--bg)}
+.paste-box b{font-weight:600;font-size:13.5px}
 
 .overlay{position:fixed;inset:0;background:rgba(7,12,38,.55);display:grid;place-items:center;padding:20px;z-index:20}
 .dialog{background:var(--surface);color:var(--ink);border-radius:16px;max-width:980px;width:100%;max-height:90vh;overflow:auto;padding:24px}
-.dialog h2{font-family:var(--display);font-weight:330;font-size:30px;letter-spacing:-.015em;margin:0 0 4px;text-wrap:balance}
+.dialog h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0 0 4px;text-wrap:balance}
 .dialog p{margin:0 0 18px;color:var(--muted)}
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .pick{border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:10px;cursor:pointer;text-align:left;display:grid;gap:8px}
 .pick:hover{border-color:var(--ink)}
 .pick .th{aspect-ratio:16/10;display:grid;place-items:center;background:var(--sunk);border-radius:8px;overflow:hidden}
 .pick canvas{max-width:100%;max-height:100%;width:auto;height:auto;display:block}
-.pick b{font-weight:600;font-size:13.5px}
-.pick small{color:var(--muted);font-size:12px;line-height:1.35}
+.pick b{font-weight:600;font-size:14px}
+.pick small{color:var(--muted);font-size:12.5px;line-height:1.35}
 .dlg-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 .fallback img{max-width:100%;max-height:60vh;display:block;margin:0 auto 12px;border:1px solid var(--line)}
 
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--on-ink);padding:9px 16px;border-radius:999px;font-size:13px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--on-ink);padding:10px 18px;border-radius:999px;font-size:14px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 
 .in-suite .brand{display:none}
 @media (max-width:900px){
@@ -127,258 +146,236 @@ table.data .dim{opacity:.4}
   .stage{min-height:auto;padding:20px 16px}
   .panel{border-left:0;border-top:1px solid var(--line);overflow:visible}
   .top{flex-wrap:wrap;padding:10px 16px}
-  .shelf{order:3;flex-basis:100%}
+  .shelf-wrap{order:3;flex-basis:100%}
   .actions{margin-left:auto}
 }
-@media (max-width:420px){ .pals{grid-template-columns:repeat(2,1fr)} .brand{font-size:20px} }
+@media (max-width:420px){ .pals,.types{grid-template-columns:repeat(2,1fr)} .shelf-label{display:none} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="app">
   <header class="top">
-    <div class="brand">Chart <em>Atelier</em></div>
-    <nav class="shelf" id="shelf" aria-label="Your charts"></nav>
+    <div class="brand">Gráficos</div>
+    <div class="shelf-wrap"><span class="shelf-label">Seus gráficos:</span><nav class="shelf" id="shelf" aria-label="Seus gráficos"></nav></div>
     <div class="actions">
-      <button class="btn" id="newBtn" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>New chart</button>
-      <button class="btn primary" id="exportTop" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10"/></svg>Export PNG</button>
+      <button class="btn" id="newBtn" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3v10M3 8h10"/></svg>Novo gráfico</button>
+      <button class="btn primary" id="exportTop" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10"/></svg>Baixar imagem</button>
     </div>
   </header>
 
   <div class="work">
-    <section class="stage" id="stage" aria-label="Preview">
-      <div class="canvas-wrap" id="wrap"><canvas id="view" role="img" aria-label="Chart preview"></canvas></div>
+    <section class="stage" id="stage" aria-label="Prévia">
+      <div class="canvas-wrap" id="wrap"><canvas id="view" role="img" aria-label="Prévia do gráfico"></canvas></div>
       <div class="meta" id="meta"></div>
     </section>
 
     <aside class="panel" id="panel">
       <details class="sec" open>
-        <summary>Chart</summary>
+        <summary><span class="num">1</span><span class="sum-t"><b>Tipo de gráfico</b><small>Clique para trocar. Seus dados continuam.</small></span></summary>
         <div class="sec-body">
-          <div class="row2">
-            <label class="field"><span>Name</span><input type="text" id="f-name" data-k="name"></label>
-            <label class="field"><span>Type</span>
-              <select id="f-type" data-k="type">
-                <option value="leaf">Columns</option>
-                <option value="grouped">Grouped columns</option>
-                <option value="capsules">Nested capsules</option>
-                <option value="pills">Nested pills</option>
-                <option value="donut">Donut</option>
-                <option value="pie">Pie</option>
-                <option value="gauge">Gauge</option>
-                <option value="line">Line</option>
-                <option value="kpi">Big number</option>
-              </select>
-            </label>
-          </div>
-          <div class="tools">
-            <button class="btn small" id="dupBtn" type="button">Duplicate</button>
-            <button class="btn small danger" id="delBtn" type="button">Delete chart</button>
-          </div>
-        </div>
-      </details>
-
-      <details class="sec" open>
-        <summary>Text</summary>
-        <div class="sec-body">
-          <label class="field"><span>Title</span><textarea id="f-title" data-k="title" rows="2" placeholder="Leave empty for no title"></textarea></label>
-          <label class="field"><span>Subtitle</span><input type="text" id="f-sub" data-k="subtitle"></label>
-          <label class="field"><span>Source / footnote</span><input type="text" id="f-note" data-k="note" placeholder="Fonte: …"></label>
-          <div class="row2" data-types="donut">
-            <label class="field"><span>Center number</span><input type="text" id="f-cv" data-k="centerValue" placeholder="Auto: total"></label>
-            <label class="field"><span>Center label</span><input type="text" id="f-cl" data-k="centerLabel"></label>
-          </div>
-          <div class="row2" data-types="line">
-            <label class="field"><span>Change label</span><input type="text" id="f-dl" data-k="deltaLabel" placeholder="hoje"></label>
-          </div>
-          <div data-types="kpi" class="sec-body" style="padding:0">
-            <label class="field"><span>Number</span><input type="text" id="f-kv" data-k="kpi.value"></label>
-            <div class="row2">
-              <label class="field"><span>Caption (top)</span><input type="text" id="f-kc" data-k="kpi.caption"></label>
-              <label class="field"><span>Tag (bottom)</span><input type="text" id="f-kt" data-k="kpi.tag"></label>
-            </div>
-          </div>
+          <div class="types" id="types"></div>
         </div>
       </details>
 
       <details class="sec" open id="dataSec">
-        <summary>Data</summary>
+        <summary><span class="num">2</span><span class="sum-t"><b>Dados</b><small>Digite os números ou cole de uma planilha</small></span></summary>
         <div class="sec-body">
           <div data-types="gauge" class="sec-body" style="padding:0">
             <div class="row3">
-              <label class="field"><span>Value</span><input type="text" id="f-gv" data-k="gauge.value"></label>
-              <label class="field"><span>Out of</span><input type="text" id="f-gm" data-k="gauge.max"></label>
-              <label class="field"><span>Shown as</span><input type="text" id="f-gt" data-k="gauge.text" placeholder="Auto"></label>
+              <label class="field"><span>Valor</span><input type="text" id="f-gv" data-k="gauge.value"></label>
+              <label class="field"><span>De um total de</span><input type="text" id="f-gm" data-k="gauge.max"></label>
+              <label class="field"><span>Texto no centro</span><input type="text" id="f-gt" data-k="gauge.text" placeholder="Automático"></label>
             </div>
-            <label class="field"><span>Label under number</span><input type="text" id="f-gl" data-k="gauge.label"></label>
+            <label class="field"><span>Legenda embaixo do número</span><input type="text" id="f-gl" data-k="gauge.label"></label>
+          </div>
+          <div data-types="kpi" class="sec-body" style="padding:0">
+            <label class="field"><span>Número</span><input type="text" id="f-kv" data-k="kpi.value"></label>
+            <div class="row2">
+              <label class="field"><span>Texto acima</span><input type="text" id="f-kc" data-k="kpi.caption"></label>
+              <label class="field"><span>Etiqueta embaixo</span><input type="text" id="f-kt" data-k="kpi.tag"></label>
+            </div>
           </div>
           <div data-types="leaf grouped capsules pills donut pie line" class="sec-body" style="padding:0">
             <p class="hint" id="dataHint"></p>
             <div class="tablewrap"><table class="data" id="table"></table></div>
             <div class="tools">
-              <button class="btn small" id="addRow" type="button">+ Row</button>
-              <button class="btn small" id="addSeries" type="button">+ Series</button>
+              <button class="btn small" id="addRow" type="button">+ Linha</button>
+              <button class="btn small" id="addSeries" type="button">+ Coluna de valores</button>
             </div>
-            <details>
-              <summary class="lbl" style="cursor:pointer">Paste from a spreadsheet</summary>
-              <div class="sec-body" style="padding:10px 0 0">
-                <textarea id="paste" rows="5" placeholder="Label	Series 1	Series 2&#10;fev.	34	30&#10;mar.	26	28"></textarea>
-                <p class="hint">Copy cells from Excel, Sheets or Numbers. The first column becomes labels; a text first row becomes series names.</p>
-                <div class="tools"><button class="btn small" id="pasteBtn" type="button">Replace data</button></div>
-              </div>
-            </details>
+            <div class="paste-box">
+              <b>Tem os dados no Excel ou no Google Planilhas?</b>
+              <textarea id="paste" rows="3" placeholder="Selecione as células, copie (Ctrl+C) e cole aqui (Ctrl+V)"></textarea>
+              <p class="hint">A primeira coluna vira os nomes. Se a primeira linha tiver títulos, eles viram os nomes das colunas de valores.</p>
+              <div class="tools"><button class="btn small primary" id="pasteBtn" type="button">Usar estes dados</button></div>
+            </div>
           </div>
         </div>
       </details>
 
       <details class="sec" open>
-        <summary>Color</summary>
+        <summary><span class="num">3</span><span class="sum-t"><b>Textos</b><small>Título, subtítulo e fonte dos dados</small></span></summary>
+        <div class="sec-body">
+          <label class="field"><span>Título</span><textarea id="f-title" data-k="title" rows="2" placeholder="Deixe vazio para não ter título"></textarea></label>
+          <label class="field"><span>Subtítulo</span><input type="text" id="f-sub" data-k="subtitle"></label>
+          <label class="field"><span>Nota de rodapé</span><input type="text" id="f-note" data-k="note" placeholder="Fonte: …"></label>
+          <div class="row2" data-types="donut">
+            <label class="field"><span>Número no centro</span><input type="text" id="f-cv" data-k="centerValue" placeholder="Automático: total"></label>
+            <label class="field"><span>Texto no centro</span><input type="text" id="f-cl" data-k="centerLabel"></label>
+          </div>
+          <div class="row2" data-types="line">
+            <label class="field"><span>Texto depois da variação</span><input type="text" id="f-dl" data-k="deltaLabel" placeholder="hoje"></label>
+          </div>
+          <div class="field" data-types="leaf donut gauge line kpi"><span>Fonte dos números</span>
+            <div class="seg">
+              <label><input type="radio" name="valueFont" value="serif" data-k="valueFont"><span id="vfHl" class="f-hl">Newsreader</span></label>
+              <label><input type="radio" name="valueFont" value="sans" data-k="valueFont"><span>DM Sans</span></label>
+            </div>
+          </div>
+          <label class="field" id="nameField"><span>Nome do gráfico (aparece na lista lá em cima)</span><input type="text" id="f-name" data-k="name"></label>
+        </div>
+      </details>
+
+      <details class="sec" open>
+        <summary><span class="num">4</span><span class="sum-t"><b>Cores</b><small>Escolha uma paleta pronta</small></span></summary>
         <div class="sec-body">
           <div class="pals" id="pals"></div>
           <div>
-            <div class="lbl" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span id="slotTitle">Colors</span><button class="btn small ghost" id="resetColors" type="button">Reset</button></div>
+            <div class="lbl" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span id="slotTitle">Trocar uma cor</span><button class="btn small ghost" id="resetColors" type="button">Voltar ao original</button></div>
             <div class="slots" id="slots"></div>
           </div>
-          <div class="field"><span>Background</span>
+          <div class="field"><span>Fundo</span>
             <div class="seg">
-              <label><input type="radio" name="bgMode" value="palette" data-k="bgMode"><span>Palette</span></label>
-              <label><input type="radio" name="bgMode" value="white" data-k="bgMode"><span>White</span></label>
-              <label><input type="radio" name="bgMode" value="custom" data-k="bgMode"><span>Custom</span></label>
-              <label><input type="radio" name="bgMode" value="none" data-k="bgMode"><span>None</span></label>
+              <label><input type="radio" name="bgMode" value="palette" data-k="bgMode"><span>Da paleta</span></label>
+              <label><input type="radio" name="bgMode" value="white" data-k="bgMode"><span>Branco</span></label>
+              <label><input type="radio" name="bgMode" value="custom" data-k="bgMode"><span>Outra cor</span></label>
+              <label><input type="radio" name="bgMode" value="none" data-k="bgMode"><span>Transparente</span></label>
             </div>
           </div>
           <div class="row2">
-            <label class="field" id="bgColorField"><span>Background color</span><input type="color" id="f-bgc" data-k="bgColor"></label>
-            <label class="field"><span>Text color</span><input type="color" id="f-ink" data-k="ink"></label>
+            <label class="field" id="bgColorField"><span>Cor do fundo</span><input type="color" id="f-bgc" data-k="bgColor"></label>
+            <label class="field"><span>Cor dos textos</span><input type="color" id="f-ink" data-k="ink"></label>
           </div>
         </div>
       </details>
 
       <details class="sec" open>
-        <summary>Shape</summary>
+        <summary><span class="num">5</span><span class="sum-t"><b>Baixar</b><small>Salva uma imagem PNG para usar no slide</small></span></summary>
         <div class="sec-body">
-          <div class="field" data-types="leaf grouped"><span>Bar corners</span>
-            <div class="seg">
-              <label><input type="radio" name="corner" value="leaf" data-k="corner"><span>Leaf</span></label>
-              <label><input type="radio" name="corner" value="top" data-k="corner"><span>Top</span></label>
-              <label><input type="radio" name="corner" value="pill" data-k="corner"><span>Round</span></label>
-              <label><input type="radio" name="corner" value="square" data-k="corner"><span>Square</span></label>
-            </div>
-          </div>
-          <label class="field" data-types="leaf grouped"><span>Corner size <output data-o="radius"></output></span><input type="range" id="f-rad" data-k="radius" min="0" max="0.5" step="0.01"></label>
-          <label class="field" data-types="leaf"><span>Space between bars <output data-o="gap"></output></span><input type="range" id="f-gap" data-k="gap" min="0" max="0.6" step="0.01"></label>
-          <label class="field" data-types="grouped"><span>Space between groups <output data-o="groupGap"></output></span><input type="range" id="f-ggap" data-k="groupGap" min="0" max="0.7" step="0.01"></label>
-          <label class="field" data-types="capsules"><span>Space between capsules <output data-o="capGap"></output></span><input type="range" id="f-cgap" data-k="capGap" min="0.02" max="0.6" step="0.01"></label>
-          <div class="field" data-types="leaf"><span>Numbers</span>
-            <div class="seg">
-              <label><input type="radio" name="valueStyle" value="header" data-k="valueStyle"><span>Headline</span></label>
-              <label><input type="radio" name="valueStyle" value="inside" data-k="valueStyle"><span>Inside bar</span></label>
-              <label><input type="radio" name="valueStyle" value="above" data-k="valueStyle"><span>Above bar</span></label>
-            </div>
-          </div>
-          <div class="field" data-types="leaf"><span>Number typeface</span>
-            <div class="seg">
-              <label><input type="radio" name="valueFont" value="serif" data-k="valueFont"><span>Serif</span></label>
-              <label><input type="radio" name="valueFont" value="sans" data-k="valueFont"><span>Sans</span></label>
-            </div>
-          </div>
-          <div class="field" data-types="leaf"><span>Color bars by</span>
-            <div class="seg">
-              <label><input type="radio" name="colorBy" value="category" data-k="colorBy"><span>Each bar</span></label>
-              <label><input type="radio" name="colorBy" value="series" data-k="colorBy"><span>One color</span></label>
-            </div>
-          </div>
-          <div class="field" data-types="pills"><span>Pill style</span>
-            <div class="seg">
-              <label><input type="radio" name="pillStyle" value="outlined" data-k="pillStyle"><span>Inset</span></label>
-              <label><input type="radio" name="pillStyle" value="flush" data-k="pillStyle"><span>Flush</span></label>
-            </div>
-          </div>
-          <label class="field" data-types="pills"><span>Pill height <output data-o="pillSize"></output></span><input type="range" id="f-psz" data-k="pillSize" min="4" max="20" step="0.5"></label>
-          <label class="field" data-types="donut"><span>Ring thickness <output data-o="thick"></output></span><input type="range" id="f-th" data-k="thick" min="0.1" max="0.8" step="0.01"></label>
-          <label class="field" data-types="gauge"><span>Arc thickness <output data-o="gthick"></output></span><input type="range" id="f-gth" data-k="gthick" min="0.01" max="0.2" step="0.005"></label>
-          <label class="field" data-types="donut pie"><span>Start angle <output data-o="rotation"></output></span><input type="range" id="f-rot" data-k="rotation" min="-180" max="180" step="5"></label>
-          <div class="checks">
-            <label class="check" data-types="leaf"><input type="checkbox" id="c-rules" data-k="rules">Column rules</label>
-            <label class="check" data-types="leaf grouped capsules pills pie"><input type="checkbox" id="c-vals" data-k="showValues">Show numbers</label>
-            <label class="check" data-types="capsules pills"><input type="checkbox" id="c-cat" data-k="showCategory">Show labels</label>
-            <label class="check" data-types="grouped"><input type="checkbox" id="c-axis" data-k="showAxis">Value axis</label>
-            <label class="check" data-types="grouped line"><input type="checkbox" id="c-grid" data-k="grid">Gridlines</label>
-            <label class="check" data-types="leaf grouped capsules pills donut pie line"><input type="checkbox" id="c-leg" data-k="showLegend">Legend</label>
-            <label class="check" data-types="donut"><input type="checkbox" id="c-caps" data-k="roundCaps">Round ends</label>
-            <label class="check" data-types="pie donut"><input type="checkbox" id="c-sort" data-k="sortDesc">Largest first</label>
-            <label class="check" data-types="line"><input type="checkbox" id="c-sum" data-k="showSummary">Headline value</label>
-            <label class="check" data-types="line"><input type="checkbox" id="c-area" data-k="area">Area fill</label>
-            <label class="check" data-types="gauge"><input type="checkbox" id="c-ul" data-k="underline">Underline number</label>
-          </div>
-        </div>
-      </details>
-
-      <details class="sec">
-        <summary>Type &amp; numbers</summary>
-        <div class="sec-body">
-          <div class="row2">
-            <label class="field"><span>Display serif</span>
-              <select id="f-serif" data-k="serif"><option>Newsreader</option><option>Fraunces</option><option>Instrument Serif</option><option>Gloock</option></select>
-            </label>
-            <label class="field"><span>Text sans</span>
-              <select id="f-sans" data-k="sans"><option>Instrument Sans</option><option>DM Sans</option><option>Manrope</option></select>
-            </label>
-          </div>
-          <label class="field"><span>Serif weight <output data-o="serifWeight"></output></span><input type="range" id="f-sw" data-k="serifWeight" min="200" max="700" step="50"></label>
-          <label class="field"><span>Text size <output data-o="typeScale"></output></span><input type="range" id="f-ts" data-k="typeScale" min="0.6" max="1.6" step="0.05"></label>
-          <div class="row3">
-            <label class="field"><span>Prefix</span><input type="text" id="f-pre" data-k="prefix" placeholder="R$ "></label>
-            <label class="field"><span>Suffix</span><input type="text" id="f-suf" data-k="suffix" placeholder="%"></label>
-            <label class="field"><span>Decimals</span><input type="number" id="f-dec" data-k="decimals" min="0" max="4" step="1"></label>
-          </div>
-          <div class="field"><span>Number format</span>
-            <div class="seg">
-              <label><input type="radio" name="locale" value="pt-BR" data-k="locale"><span>1.234,5</span></label>
-              <label><input type="radio" name="locale" value="en-US" data-k="locale"><span>1,234.5</span></label>
-            </div>
-          </div>
-        </div>
-      </details>
-
-      <details class="sec">
-        <summary>Canvas</summary>
-        <div class="sec-body">
-          <label class="field"><span>Size</span>
+          <label class="field"><span>Tamanho</span>
             <select id="f-preset" data-k="preset">
-              <option value="1920x1080">Slide 16:9 · 1920 × 1080</option>
-              <option value="1600x900">Half slide · 1600 × 900</option>
-              <option value="1200x900">4:3 · 1200 × 900</option>
-              <option value="1080x1080">Square · 1080 × 1080</option>
-              <option value="1080x1350">Portrait 4:5 · 1080 × 1350</option>
-              <option value="1080x1920">Story 9:16 · 1080 × 1920</option>
-              <option value="custom">Custom</option>
+              <option value="1920x1080">Slide inteiro (horizontal)</option>
+              <option value="1600x900">Meio slide (horizontal)</option>
+              <option value="1200x900">Formato 4:3</option>
+              <option value="1080x1080">Quadrado (post)</option>
+              <option value="1080x1350">Retrato (post vertical)</option>
+              <option value="1080x1920">Story (tela de celular)</option>
+              <option value="custom">Personalizado</option>
             </select>
           </label>
-          <div class="row2">
-            <label class="field"><span>Width px</span><input type="number" id="f-w" data-k="w" min="200" max="6000" step="10"></label>
-            <label class="field"><span>Height px</span><input type="number" id="f-h" data-k="h" min="200" max="6000" step="10"></label>
-          </div>
-          <label class="field"><span>Margin <output data-o="padding"></output></span><input type="range" id="f-pad" data-k="padding" min="0" max="18" step="0.5"></label>
-          <label class="check"><input type="checkbox" id="c-frame" data-k="frame">Card outline</label>
-        </div>
-      </details>
-
-      <details class="sec" open>
-        <summary>Export</summary>
-        <div class="sec-body">
-          <div class="field"><span>Resolution</span>
+          <div class="field"><span>Qualidade</span>
             <div class="seg">
-              <label><input type="radio" name="scale" value="1" data-k="exportScale" data-num><span>1×</span></label>
-              <label><input type="radio" name="scale" value="2" data-k="exportScale" data-num><span>2×</span></label>
-              <label><input type="radio" name="scale" value="3" data-k="exportScale" data-num><span>3×</span></label>
-              <label><input type="radio" name="scale" value="4" data-k="exportScale" data-num><span>4×</span></label>
+              <label><input type="radio" name="scale" value="1" data-k="exportScale" data-num><span>Normal</span></label>
+              <label><input type="radio" name="scale" value="2" data-k="exportScale" data-num><span>Alta</span></label>
+              <label><input type="radio" name="scale" value="4" data-k="exportScale" data-num><span>Máxima</span></label>
             </div>
           </div>
           <p class="hint" id="exportInfo"></p>
-          <div class="tools">
-            <button class="btn primary" id="exportBtn" type="button">Export PNG</button>
-            <button class="btn" id="copyBtn" type="button">Copy image</button>
+          <button class="btn primary big" id="exportBtn" type="button">Baixar imagem (PNG)</button>
+          <div class="tools"><button class="btn small" id="copyBtn" type="button">Copiar imagem</button><button class="btn small" id="dupBtn" type="button">Duplicar gráfico</button><button class="btn small danger" id="delBtn" type="button">Apagar gráfico</button></div>
+        </div>
+      </details>
+
+      <div class="more-head">Mais ajustes (opcional)</div>
+
+      <details class="sec minor">
+        <summary><span class="sum-t"><b>Formato das barras e fatias</b></span></summary>
+        <div class="sec-body">
+          <div class="field" data-types="leaf grouped"><span>Cantos das barras</span>
+            <div class="seg">
+              <label><input type="radio" name="corner" value="leaf" data-k="corner"><span>Folha</span></label>
+              <label><input type="radio" name="corner" value="top" data-k="corner"><span>Arredondado</span></label>
+              <label><input type="radio" name="corner" value="pill" data-k="corner"><span>Redondo</span></label>
+              <label><input type="radio" name="corner" value="square" data-k="corner"><span>Reto</span></label>
+            </div>
           </div>
+          <label class="field" data-types="leaf grouped"><span>Tamanho da curva <output data-o="radius"></output></span><input type="range" id="f-rad" data-k="radius" min="0" max="0.5" step="0.01"></label>
+          <label class="field" data-types="leaf"><span>Espaço entre as barras <output data-o="gap"></output></span><input type="range" id="f-gap" data-k="gap" min="0" max="0.6" step="0.01"></label>
+          <label class="field" data-types="grouped"><span>Espaço entre os grupos <output data-o="groupGap"></output></span><input type="range" id="f-ggap" data-k="groupGap" min="0" max="0.7" step="0.01"></label>
+          <label class="field" data-types="capsules"><span>Espaço entre as cápsulas <output data-o="capGap"></output></span><input type="range" id="f-cgap" data-k="capGap" min="0.02" max="0.6" step="0.01"></label>
+          <div class="field" data-types="leaf"><span>Onde ficam os números</span>
+            <div class="seg">
+              <label><input type="radio" name="valueStyle" value="header" data-k="valueStyle"><span>Grandes, no topo</span></label>
+              <label><input type="radio" name="valueStyle" value="inside" data-k="valueStyle"><span>Dentro da barra</span></label>
+              <label><input type="radio" name="valueStyle" value="above" data-k="valueStyle"><span>Em cima da barra</span></label>
+            </div>
+          </div>
+          <div class="field" data-types="leaf"><span>Cores das barras</span>
+            <div class="seg">
+              <label><input type="radio" name="colorBy" value="category" data-k="colorBy"><span>Uma cor para cada</span></label>
+              <label><input type="radio" name="colorBy" value="series" data-k="colorBy"><span>Todas iguais</span></label>
+            </div>
+          </div>
+          <div class="field" data-types="pills"><span>Estilo</span>
+            <div class="seg">
+              <label><input type="radio" name="pillStyle" value="outlined" data-k="pillStyle"><span>Uma dentro da outra</span></label>
+              <label><input type="radio" name="pillStyle" value="flush" data-k="pillStyle"><span>Lado a lado</span></label>
+            </div>
+          </div>
+          <label class="field" data-types="pills"><span>Altura das barras <output data-o="pillSize"></output></span><input type="range" id="f-psz" data-k="pillSize" min="4" max="20" step="0.5"></label>
+          <label class="field" data-types="donut"><span>Espessura do anel <output data-o="thick"></output></span><input type="range" id="f-th" data-k="thick" min="0.1" max="0.8" step="0.01"></label>
+          <label class="field" data-types="gauge"><span>Espessura do arco <output data-o="gthick"></output></span><input type="range" id="f-gth" data-k="gthick" min="0.01" max="0.2" step="0.005"></label>
+          <label class="field" data-types="donut pie"><span>Girar <output data-o="rotation"></output></span><input type="range" id="f-rot" data-k="rotation" min="-180" max="180" step="5"></label>
+          <div class="checks">
+            <label class="check" data-types="leaf"><input type="checkbox" id="c-rules" data-k="rules">Linhas entre colunas</label>
+            <label class="check" data-types="leaf grouped capsules pills pie"><input type="checkbox" id="c-vals" data-k="showValues">Mostrar números</label>
+            <label class="check" data-types="capsules pills"><input type="checkbox" id="c-cat" data-k="showCategory">Mostrar nomes</label>
+            <label class="check" data-types="grouped"><input type="checkbox" id="c-axis" data-k="showAxis">Escala de valores</label>
+            <label class="check" data-types="grouped line"><input type="checkbox" id="c-grid" data-k="grid">Linhas de grade</label>
+            <label class="check" data-types="leaf grouped capsules pills donut pie line"><input type="checkbox" id="c-leg" data-k="showLegend">Legenda</label>
+            <label class="check" data-types="donut"><input type="checkbox" id="c-caps" data-k="roundCaps">Pontas redondas</label>
+            <label class="check" data-types="pie donut"><input type="checkbox" id="c-sort" data-k="sortDesc">Maior primeiro</label>
+            <label class="check" data-types="line"><input type="checkbox" id="c-sum" data-k="showSummary">Valor em destaque</label>
+            <label class="check" data-types="line"><input type="checkbox" id="c-area" data-k="area">Preencher área</label>
+            <label class="check" data-types="gauge"><input type="checkbox" id="c-ul" data-k="underline">Sublinhar número</label>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec minor">
+        <summary><span class="sum-t"><b>Letras e números</b></span></summary>
+        <div class="sec-body">
+          <div class="field"><span>Fonte de destaque (títulos e números grandes)</span>
+            <div class="seg">
+              <label><input type="radio" name="serif" value="Newsreader" data-k="serif"><span class="f-hl">Newsreader</span></label>
+              <label><input type="radio" name="serif" value="Tenor Sans" data-k="serif"><span class="f-tenor">Tenor Sans</span></label>
+            </div>
+          </div>
+          <p class="hint">Os demais textos usam DM Sans.</p>
+          <label class="field" id="weightField"><span>Peso da Newsreader <output data-o="serifWeight"></output></span><input type="range" id="f-sw" data-k="serifWeight" min="200" max="700" step="50"></label>
+          <label class="field"><span>Tamanho dos textos <output data-o="typeScale"></output></span><input type="range" id="f-ts" data-k="typeScale" min="0.6" max="1.6" step="0.05"></label>
+          <div class="row3">
+            <label class="field"><span>Antes do número</span><input type="text" id="f-pre" data-k="prefix" placeholder="R$ "></label>
+            <label class="field"><span>Depois do número</span><input type="text" id="f-suf" data-k="suffix" placeholder="%"></label>
+            <label class="field"><span>Casas decimais</span><input type="number" id="f-dec" data-k="decimals" min="0" max="4" step="1"></label>
+          </div>
+          <div class="field"><span>Formato dos números</span>
+            <div class="seg">
+              <label><input type="radio" name="locale" value="pt-BR" data-k="locale"><span>Brasil · 1.234,5</span></label>
+              <label><input type="radio" name="locale" value="en-US" data-k="locale"><span>EUA · 1,234.5</span></label>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="sec minor">
+        <summary><span class="sum-t"><b>Tamanho e margens</b></span></summary>
+        <div class="sec-body">
+          <div class="row2">
+            <label class="field"><span>Largura (px)</span><input type="number" id="f-w" data-k="w" min="200" max="6000" step="10"></label>
+            <label class="field"><span>Altura (px)</span><input type="number" id="f-h" data-k="h" min="200" max="6000" step="10"></label>
+          </div>
+          <label class="field"><span>Margem <output data-o="padding"></output></span><input type="range" id="f-pad" data-k="padding" min="0" max="18" step="0.5"></label>
+          <label class="check"><input type="checkbox" id="c-frame" data-k="frame">Contorno de cartão</label>
         </div>
       </details>
     </aside>
@@ -387,19 +384,19 @@ table.data .dim{opacity:.4}
 
 <div class="overlay" id="picker" hidden>
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
-    <h2 id="pickTitle">Start a new chart</h2>
-    <p>Each one starts with sample data you can replace.</p>
+    <h2 id="pickTitle">Qual gráfico você quer fazer?</h2>
+    <p>Todos começam com dados de exemplo. Depois é só trocar pelos seus.</p>
     <div class="picks" id="picks"></div>
-    <div class="dlg-foot"><button class="btn" id="pickClose" type="button">Cancel</button></div>
+    <div class="dlg-foot"><button class="btn" id="pickClose" type="button">Cancelar</button></div>
   </div>
 </div>
 
 <div class="overlay" id="fallback" hidden>
   <div class="dialog fallback" role="dialog" aria-modal="true" aria-labelledby="fbTitle">
-    <h2 id="fbTitle">Your PNG is ready</h2>
-    <p>Saving files directly isn't available here. Right-click the image (or long-press on a phone) and choose “Save image”.</p>
-    <img id="fbImg" alt="Exported chart">
-    <div class="dlg-foot"><button class="btn" id="fbClose" type="button">Close</button></div>
+    <h2 id="fbTitle">Sua imagem está pronta</h2>
+    <p>Clique com o botão direito na imagem (ou segure o dedo, no celular) e escolha “Salvar imagem”.</p>
+    <img id="fbImg" alt="Gráfico exportado">
+    <div class="dlg-foot"><button class="btn" id="fbClose" type="button">Fechar</button></div>
   </div>
 </div>
 
@@ -411,12 +408,12 @@ table.data .dim{opacity:.4}
 
 /* ---------- palettes drawn from the reference work ---------- */
 const PALETTES = {
-  cream:  { name:'Cobalt',   bg:'#FDF8F0', ink:'#121C4A', colors:['#4174CC','#6792D6','#E8C36D','#B1C7EA','#121C4A'] },
-  navy:   { name:'Midnight', bg:'#111C4B', ink:'#FBF4E6', colors:['#E8C36D','#4174CC','#8AABDF','#F2DAA3','#FBF4E6'] },
-  sky:    { name:'Sky',      bg:'#D4E4F4', ink:'#121C4A', colors:['#4174CC','#8AABDF','#E8C36D','#121C4A'] },
-  gold:   { name:'Honey',    bg:'#FDF8F0', ink:'#121C4A', colors:['#E8C36D','#F2DAA3','#FAF1E1','#EECD8A'] },
-  forest: { name:'Forest',   bg:'#FDF8F0', ink:'#3D544D', colors:['#3D544D','#617570','#8A9893','#B2BCB8'] },
-  taupe:  { name:'Taupe',    bg:'#FFFFFF', ink:'#121C4A', colors:['#BAA591','#C6B3A4','#D6C8BB','#E6DCD2'] },
+  cream:  { name:'Cobalto',   bg:'#FDF8F0', ink:'#121C4A', colors:['#4174CC','#6792D6','#E8C36D','#B1C7EA','#121C4A'] },
+  navy:   { name:'Noite', bg:'#111C4B', ink:'#FBF4E6', colors:['#E8C36D','#4174CC','#8AABDF','#F2DAA3','#FBF4E6'] },
+  sky:    { name:'Céu',      bg:'#D4E4F4', ink:'#121C4A', colors:['#4174CC','#8AABDF','#E8C36D','#121C4A'] },
+  gold:   { name:'Mel',    bg:'#FDF8F0', ink:'#121C4A', colors:['#E8C36D','#F2DAA3','#FAF1E1','#EECD8A'] },
+  forest: { name:'Floresta',   bg:'#FDF8F0', ink:'#3D544D', colors:['#3D544D','#617570','#8A9893','#B2BCB8'] },
+  taupe:  { name:'Areia',    bg:'#FFFFFF', ink:'#121C4A', colors:['#BAA591','#C6B3A4','#D6C8BB','#E6DCD2'] },
 };
 
 const SERIES_LIMIT = { leaf:1, grouped:8, capsules:3, pills:3, donut:1, pie:1, line:8, gauge:0, kpi:0 };
@@ -436,9 +433,9 @@ const rows = arr => arr.map(a => ({ label:String(a[0]), v:a.slice(1).map(String)
 
 function base(){
   return {
-    id:uid(), name:'Untitled chart', type:'leaf', title:'', subtitle:'', note:'',
-    series:['Series 1'], rows:[], palette:'cream', colors:[], bgMode:'palette', bgColor:'#FFFFFF', ink:'',
-    serif:'Newsreader', serifWeight:300, sans:'Instrument Sans',
+    id:uid(), name:'Gráfico sem nome', type:'leaf', title:'', subtitle:'', note:'',
+    series:['Valores'], rows:[], palette:'cream', colors:[], bgMode:'palette', bgColor:'#FFFFFF', ink:'',
+    serif:'Newsreader', serifWeight:300, sans:'DM Sans',
     preset:'1600x900', w:1600, h:900, typeScale:1, padding:7, frame:false,
     corner:'leaf', radius:0.22, gap:0, groupGap:0.2, capGap:0.14,
     valueStyle:'header', valueFont:'serif', rules:true, colorBy:'category',
@@ -464,37 +461,37 @@ function lineSample(){
 }
 
 const TEMPLATES = [
-  { id:'leaf-editorial', label:'Columns · headline numbers', desc:'Big serif figures over leaf-cornered bars, split by rules.',
+  { id:'leaf-editorial', label:'Colunas com números grandes', desc:'Números grandes no topo de cada coluna. Bom para comparar meses.',
     make:()=>({ type:'leaf', name:'Fev – Abr', palette:'cream', valueStyle:'header', valueFont:'serif', suffix:'%', preset:'1200x900', w:1200, h:900,
       rows:rows([['fev.',34],['mar.',26],['abr.',41]]) }) },
-  { id:'leaf-labeled', label:'Columns · labeled', desc:'Numbers inside the bars, descriptions underneath.',
+  { id:'leaf-labeled', label:'Colunas com descrição', desc:'Número dentro da barra e uma explicação embaixo.',
     make:()=>({ type:'leaf', name:'Calculadora', palette:'gold', title:'Calculadora\nde pagamentos', valueStyle:'inside', valueFont:'sans', rules:false,
       colors:['#EECD8A','#E8C36D','#EECD8A','#F2DAA3'],
       rows:[{label:'Meses a pagar com base no mínimo.',v:['60'],t:''},{label:'Meses a pagar com base em pagamento proposto',v:['90'],t:''},{label:'Taxa de juros com base no mínimo',v:['60'],t:'R$ 2.364'},{label:'Total de juros com base em pagamento proposto',v:['44'],t:'R$ 436'}] }) },
-  { id:'grouped', label:'Grouped columns', desc:'Compare series side by side on a value axis.',
+  { id:'grouped', label:'Colunas lado a lado', desc:'Compara dois ou mais valores em cada grupo, como previsto e realizado.',
     make:()=>({ type:'grouped', name:'Fluxo do mês', palette:'sky', prefix:'$', series:['Previsto','Realizado'], showAxis:true, showValues:false,
       rows:rows([['Flow',2960,2430],['Receitas do mês',4950,4480],['Gastos do mês',3880,3880]]) }) },
-  { id:'capsules', label:'Nested capsules', desc:'Up to three layers per column, read from outside in.',
+  { id:'capsules', label:'Cápsulas', desc:'Até três valores, um dentro do outro, em cada coluna.',
     make:()=>({ type:'capsules', name:'Camadas', palette:'forest', bgMode:'white', series:['Total','Ativos','Recorrentes'],
       rows:rows([['T1',21,16.4,12.6],['T2',54,46,37],['T3',18,15.5,11],['T4',35,21.7,14.4]]) }) },
-  { id:'pills-inset', label:'Nested pills · inset', desc:'Horizontal capsules with inset layers.',
+  { id:'pills-inset', label:'Barras horizontais', desc:'Até três valores por linha, um dentro do outro.',
     make:()=>({ type:'pills', name:'Faixas', palette:'gold', bgMode:'white', pillStyle:'outlined', series:['Meta','Projetado','Atual'],
       rows:rows([['Norte',25,20,14],['Sudeste',55,38,25],['Sul',45,25,18]]) }) },
-  { id:'pills-flush', label:'Nested pills · flush', desc:'Layers share one height, ends stepping back.',
+  { id:'pills-flush', label:'Barras horizontais lisas', desc:'Até três valores por linha, todos da mesma altura.',
     make:()=>({ type:'pills', name:'Faixas taupe', palette:'taupe', pillStyle:'flush', series:['Meta','Projetado','Atual'],
       rows:rows([['Norte',25,20,14],['Sudeste',55,38,25],['Sul',45,25,18]]) }) },
-  { id:'donut', label:'Donut', desc:'Round-ended ring with a headline number.',
+  { id:'donut', label:'Rosca', desc:'Mostra partes de um todo, com um número no centro.',
     make:()=>({ type:'donut', name:'Clientes', palette:'cream', preset:'1080x1080', w:1080, h:1080, colors:['#4174CC','#B1C7EA'], roundCaps:true, sortDesc:false,
       centerValue:'2.345', centerLabel:'Clientes ativos', rows:rows([['Ativos',78],['Inativos',22]]) }) },
-  { id:'pie', label:'Pie', desc:'Share of total with labels inside each slice.',
+  { id:'pie', label:'Pizza', desc:'Mostra quanto cada parte representa do total, em %.',
     make:()=>({ type:'pie', name:'Por trimestre', palette:'forest', preset:'1080x1080', w:1080, h:1080, decimals:1,
       rows:rows([['1º tri',8.2],['2º tri',3.2],['3º tri',1.4],['4º tri',1.2]]) }) },
-  { id:'gauge', label:'Gauge', desc:'One percentage around a hairline ring.',
+  { id:'gauge', label:'Medidor', desc:'Um único percentual, como uma meta atingida.',
     make:()=>({ type:'gauge', name:'Progresso', palette:'navy', preset:'1080x1080', w:1080, h:1080, suffix:'%', gauge:{value:'50',max:'100',text:'',label:''} }) },
-  { id:'line', label:'Line', desc:'A trend with a headline value and change.',
+  { id:'line', label:'Linha', desc:'Mostra como um valor mudou ao longo do tempo.',
     make:()=>({ type:'line', name:'Investindo', palette:'navy', title:'Investindo', prefix:'$', decimals:2, frame:true, deltaLabel:'hoje',
       grid:true, series:['Carteira'], rows:rows(lineSample()) }) },
-  { id:'kpi', label:'Big number', desc:'A single figure with caption and tag.',
+  { id:'kpi', label:'Número em destaque', desc:'Um único número grande, com um texto de apoio.',
     make:()=>({ type:'kpi', name:'Câmbio', palette:'navy', frame:true, preset:'1600x900', w:1600, h:900,
       kpi:{ value:'US$ 3.632,52', caption:'US$ 1 = R$ 5,51', tag:'Quinta-feira 15/08' } }) },
 ];
@@ -549,6 +546,7 @@ const col = (c,P,i) => c.colors[i] || P.colors[i % P.colors.length];
 /* ---------- canvas helpers ---------- */
 const serifF = (c,s,w) => `${w ?? c.serifWeight} ${s}px "${c.serif}", Georgia, serif`;
 const sansF  = (c,s,w) => `${w ?? 400} ${s}px "${c.sans}", "Helvetica Neue", Arial, sans-serif`;
+const hlF = (c,s) => c.valueFont==='sans' ? sansF(c,s,500) : serifF(c,s);
 
 function wrap(ctx, text, maxW){
   const out = [];
@@ -588,7 +586,7 @@ function parsedRows(c){
 }
 function empty(ctx,c,P,b,u,msg){
   ctx.fillStyle = alpha(P.ink,.5); ctx.font = sansF(c,2.6*u); ctx.textAlign = 'center';
-  ctx.fillText(msg || 'Add data in the Data panel', b.x+b.w/2, b.y+b.h/2); ctx.textAlign = 'left';
+  ctx.fillText(msg || 'Preencha os dados no passo 2', b.x+b.w/2, b.y+b.h/2); ctx.textAlign = 'left';
 }
 
 /* ---------- frame pieces ---------- */
@@ -846,7 +844,7 @@ DRAW.donut = (ctx,c,P,b,u) => {
   ctx.lineCap = 'butt';
   const ri = Ro - t; if (ri < 10) return;
   const txt = c.centerValue || fmt(total,c);
-  const s = fit(ctx, z=>serifF(c,z), txt, ri*0.52*c.typeScale, ri*1.55);
+  const s = fit(ctx, z=>hlF(c,z), txt, ri*0.52*c.typeScale, ri*1.55);
   ctx.fillStyle = P.ink; ctx.textAlign = 'center';
   const hasL = c.centerLabel && c.centerLabel.trim();
   const ty = hasL ? cy + s*0.18 : cy + s*0.32;
@@ -894,7 +892,7 @@ DRAW.gauge = (ctx,c,P,b,u) => {
     ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2 + frac*Math.PI*2 - (frac>=1?1e-4:0)); ctx.stroke(); ctx.lineCap = 'butt';
   }
   const txt = c.gauge.text || fmt(v,c);
-  const s = fit(ctx, z=>serifF(c,z), txt, r*0.5*c.typeScale, r*1.25);
+  const s = fit(ctx, z=>hlF(c,z), txt, r*0.5*c.typeScale, r*1.25);
   const tw = ctx.measureText(txt).width;
   const hasL = c.gauge.label && c.gauge.label.trim();
   const ty = cy + s*(hasL ? 0.22 : 0.33);
@@ -906,12 +904,12 @@ DRAW.gauge = (ctx,c,P,b,u) => {
 
 DRAW.line = (ctx,c,P,b,u) => {
   const R = parsedRows(c); const n = R.length;
-  if (n < 2) return empty(ctx,c,P,b,u,'Add at least two rows of data');
+  if (n < 2) return empty(ctx,c,P,b,u,'Preencha pelo menos duas linhas de dados');
   const S = Math.max(1, Math.min(c.series.length, SERIES_LIMIT.line));
   let top = b.y;
   if (c.showSummary){
     const first = R[0].v[0]||0, last = R[n-1].v[0]||0, diff = last-first;
-    const vs = fit(ctx, z=>serifF(c,z), fmt(last,c), 9*u, b.w);
+    const vs = fit(ctx, z=>hlF(c,z), fmt(last,c), 9*u, b.w);
     ctx.fillStyle = P.ink; ctx.fillText(fmt(last,c), b.x - vs*0.03, top + vs*0.8);
     const ds = 2.4*u, dy = top + vs*0.8 + ds*2.1;
     const pct = first ? diff/Math.abs(first)*100 : 0;
@@ -962,7 +960,7 @@ DRAW.kpi = (ctx,c,P,b,u) => {
     ctx.fillStyle = P.ink; ctx.fillText(k.tag, b.x + s*1.2, bottom - h/2 + s*0.36); bottom -= h + 2*u;
   }
   const txt = k.value || '—';
-  const s = fit(ctx, z=>serifF(c,z), txt, 20*u, b.w*0.94);
+  const s = fit(ctx, z=>hlF(c,z), txt, 20*u, b.w*0.94);
   ctx.fillStyle = P.ink; ctx.textAlign = 'center';
   ctx.fillText(txt, b.x + b.w/2, (top+bottom)/2 + s*0.33); ctx.textAlign = 'left';
 };
@@ -995,7 +993,8 @@ function load(){
   try {
     const s = JSON.parse(localStorage.getItem(KEY));
     if (s && Array.isArray(s.charts) && s.charts.length){
-      s.charts = s.charts.map(c => { const d = base(); return Object.assign(d, c, { gauge:Object.assign(d.gauge, c.gauge), kpi:Object.assign(d.kpi, c.kpi) }); });
+      s.charts = s.charts.map(c => { const d = base(); const o = Object.assign(d, c, { gauge:Object.assign(d.gauge, c.gauge), kpi:Object.assign(d.kpi, c.kpi) });
+        o.sans = 'DM Sans'; if (o.serif !== 'Tenor Sans') o.serif = 'Newsreader'; if (o.exportScale === 3) o.exportScale = 2; return o; });
       if (!s.charts.find(c=>c.id===s.current)) s.current = s.charts[0].id;
       return s;
     }
@@ -1036,8 +1035,8 @@ function draw(){
   ctx.setTransform(pw/c.w, 0, 0, phh/c.h, 0, 0);
   render(ctx, c, c.w, c.h);
   wrapEl.classList.toggle('checker', c.bgMode === 'none');
-  meta.textContent = `${c.w} × ${c.h} px  ·  exports at ${c.w*c.exportScale} × ${c.h*c.exportScale}`;
-  view.setAttribute('aria-label', `${c.name} chart preview`);
+  meta.textContent = `Prévia · a imagem baixada terá ${c.w*c.exportScale} × ${c.h*c.exportScale} px`;
+  view.setAttribute('aria-label', `Prévia: ${c.name}`);
 }
 let rafId = 0;
 function redraw(){ cancelAnimationFrame(rafId); rafId = requestAnimationFrame(draw); }
@@ -1058,7 +1057,7 @@ function buildShelf(){
     const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.id = c.id;
     b.setAttribute('aria-current', c.id === state.current ? 'true' : 'false');
     const cv = document.createElement('canvas'); thumb(cv, c, 88, 56);
-    const sp = document.createElement('span'); sp.textContent = c.name || 'Untitled';
+    const sp = document.createElement('span'); sp.textContent = c.name || 'Sem nome';
     b.append(cv, sp); shelf.append(b);
   });
 }
@@ -1067,7 +1066,7 @@ function refreshChip(){
   clearTimeout(shelfT);
   shelfT = setTimeout(() => {
     const c = cur(); const chip = shelf.querySelector(`[data-id="${c.id}"]`); if (!chip) return buildShelf();
-    thumb(chip.querySelector('canvas'), c, 88, 56); chip.querySelector('span').textContent = c.name || 'Untitled';
+    thumb(chip.querySelector('canvas'), c, 88, 56); chip.querySelector('span').textContent = c.name || 'Sem nome';
   }, 250);
 }
 shelf.addEventListener('click', e => {
@@ -1098,7 +1097,10 @@ function syncAll(){
   panel.querySelectorAll('output[data-o]').forEach(o => { const k = o.dataset.o; o.textContent = OUT[k] ? OUT[k](c[k]) : c[k]; });
   panel.querySelectorAll('[data-types]').forEach(el => el.hidden = !el.dataset.types.split(' ').includes(c.type));
   document.getElementById('bgColorField').hidden = c.bgMode !== 'custom';
-  buildPals(); buildSlots(); buildTable(); exportInfo();
+  document.getElementById('vfHl').textContent = c.serif;
+  document.getElementById('vfHl').className = c.serif === 'Tenor Sans' ? 'f-tenor' : 'f-hl';
+  document.getElementById('weightField').hidden = c.serif !== 'Newsreader';
+  buildTypes(); buildPals(); buildSlots(); buildTable(); exportInfo();
 }
 
 panel.addEventListener('input', e => {
@@ -1113,12 +1115,47 @@ panel.addEventListener('input', e => {
   if (k === 'decimals') v = Math.max(0, Math.min(4, v|0));
   setPath(c, k, v);
   if (k === 'preset' && v !== 'custom'){ const [w,h] = v.split('x').map(Number); c.w = w; c.h = h; }
-  if (k === 'type' || k === 'preset' || k === 'bgMode' || k === 'palette' || k === 'locale' || k === 'exportScale' || k === 'colorBy') syncAll();
+  if (k === 'serif' || k === 'preset' || k === 'bgMode' || k === 'palette' || k === 'locale' || k === 'exportScale' || k === 'colorBy') syncAll();
   else {
     const o = panel.querySelector(`output[data-o="${k}"]`); if (o) o.textContent = OUT[k] ? OUT[k](v) : v;
     if (k === 'name') {}
   }
   save(); redraw(); refreshChip();
+});
+
+
+/* chart type tiles (step 1) */
+const TYPE_TILES = [
+  ['leaf','Colunas','leaf-editorial'],['grouped','Colunas lado a lado','grouped'],['capsules','Cápsulas','capsules'],
+  ['pills','Barras horizontais','pills-inset'],['donut','Rosca','donut'],['pie','Pizza','pie'],
+  ['gauge','Medidor','gauge'],['line','Linha','line'],['kpi','Número em destaque','kpi'],
+];
+const typesEl = document.getElementById('types');
+let typesBuilt = false;
+function buildTypes(){
+  const c = cur();
+  if (!typesBuilt){
+    typesEl.innerHTML = '';
+    TYPE_TILES.forEach(([type,label,tid]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'type'; b.dataset.type = type;
+      const cv = document.createElement('canvas'); const t = fromTemplate(TEMPLATES.find(x => x.id === tid));
+      t.title = ''; t.subtitle = ''; t.note = ''; t.frame = false;
+      const W = 192, H = 120; cv.width = W; cv.height = H;
+      const ctx = cv.getContext('2d'); const sc = Math.max(W/t.w, H/t.h);
+      ctx.setTransform(sc,0,0,sc,(W - t.w*sc)/2,(H - t.h*sc)/2); render(ctx, t, t.w, t.h);
+      const sp = document.createElement('span'); sp.textContent = label;
+      b.append(cv, sp); typesEl.append(b);
+    });
+    typesBuilt = true;
+  }
+  typesEl.querySelectorAll('.type').forEach(b => b.setAttribute('aria-pressed', b.dataset.type === c.type ? 'true' : 'false'));
+}
+typesEl.addEventListener('click', e => {
+  const b = e.target.closest('.type'); if (!b) return;
+  const c = cur(); if (c.type === b.dataset.type) return;
+  c.type = b.dataset.type;
+  if ((c.type === 'gauge' || c.type === 'kpi') && !c.rows.length) {}
+  save(); syncAll(); redraw(); refreshChip();
 });
 
 /* palettes */
@@ -1145,17 +1182,17 @@ palsEl.addEventListener('click', e => {
 const slotsEl = document.getElementById('slots');
 function slotNames(c){
   if (c.type==='pie' || c.type==='donut' || (c.type==='leaf' && c.colorBy==='category')) return c.rows.map(r => r.label || '—');
-  if (c.type==='leaf') return ['Bars'];
-  if (c.type==='gauge') return ['Arc & number','Underline'];
+  if (c.type==='leaf') return ['Barras'];
+  if (c.type==='gauge') return ['Arco e número','Sublinhado'];
   if (c.type==='kpi') return [];
   const S = Math.max(1, Math.min(c.series.length, SERIES_LIMIT[c.type]||1));
-  if (c.type==='capsules' || c.type==='pills') return c.series.slice(0,S).map((n,i)=>['Outer','Middle','Inner'][i] + ' · ' + n);
+  if (c.type==='capsules' || c.type==='pills') return c.series.slice(0,S).map((n,i)=>['Por fora','Meio','Por dentro'][i] + ' · ' + n);
   return c.series.slice(0,S);
 }
 function buildSlots(){
   const c = cur(), P = pal(c), names = slotNames(c);
   slotsEl.innerHTML = '';
-  document.getElementById('slotTitle').textContent = names.length ? 'Colors' : 'Colors · this chart uses the text color';
+  document.getElementById('slotTitle').textContent = names.length ? 'Trocar uma cor' : 'Este gráfico usa a cor dos textos';
   names.forEach((n,i) => {
     const w = document.createElement('label'); w.className = 'slot';
     const inp = document.createElement('input'); inp.type = 'color'; inp.value = col(c,P,i); inp.dataset.slot = i; inp.id = 'slot-'+i;
@@ -1176,36 +1213,38 @@ function buildTable(){
   const c = cur(); const lim = SERIES_LIMIT[c.type] ?? 1;
   const S = c.series.length, showText = TEXT_COL_TYPES.includes(c.type);
   const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-  let h = '<thead><tr><th><input value="Label" disabled aria-label="Label column"></th>';
+  let h = '<thead><tr><th><input value="Nome" disabled aria-label="Coluna de nomes"></th>';
   c.series.forEach((n,s) => {
-    h += `<th class="${s>=lim?'dim':''}"><div class="th-wrap"><input id="sn-${s}" data-sn="${s}" value="${esc(n)}" aria-label="Series ${s+1} name">${S>1?`<button class="x" type="button" data-delseries="${s}" aria-label="Remove series ${esc(n)}">×</button>`:''}</div></th>`;
+    h += `<th class="${s>=lim?'dim':''}"><div class="th-wrap"><input id="sn-${s}" data-sn="${s}" value="${esc(n)}" aria-label="Nome da coluna ${s+1}">${S>1?`<button class="x" type="button" data-delseries="${s}" aria-label="Apagar coluna ${esc(n)}" title="Apagar esta coluna">×</button>`:''}</div></th>`;
   });
   const isPie = c.type === 'pie';
   if (showText) h += isPie
-    ? '<th><input value="Big label" disabled aria-label="Big label column"></th><th><input value="Small label" disabled aria-label="Small label column"></th>'
-    : '<th><input value="Shown as" disabled aria-label="Custom text column"></th>';
+    ? '<th><input value="Grande" disabled aria-label="Coluna de texto grande"></th><th><input value="Pequeno" disabled aria-label="Coluna de texto pequeno"></th>'
+    : '<th><input value="Texto exibido" disabled aria-label="Coluna de texto exibido"></th>';
   h += '<th></th></tr></thead><tbody>';
   const pv = c.rows.map(r => Math.max(0, num(r.v[0], c.locale)));
   const autoPct = pcts(pv, pv.reduce((a,b)=>a+b,0));
   c.rows.forEach((r,i) => {
-    h += `<tr><td class="lab"><input id="rl-${i}" data-r="${i}" data-f="label" value="${esc(r.label)}" aria-label="Row ${i+1} label"></td>`;
+    h += `<tr><td class="lab"><input id="rl-${i}" data-r="${i}" data-f="label" value="${esc(r.label)}" aria-label="Nome da linha ${i+1}"></td>`;
     c.series.forEach((n,s) => { h += `<td class="${s>=lim?'dim':''}"><input id="rv-${i}-${s}" data-r="${i}" data-s="${s}" value="${esc(r.v[s] ?? '')}" inputmode="decimal" aria-label="${esc(r.label)} ${esc(n)}"></td>`; });
     if (showText && isPie){
-      h += `<td><input id="rt-${i}" data-r="${i}" data-f="t" value="${esc(r.t)}" placeholder="${autoPct[i]}%" aria-label="${esc(r.label)} big label"></td>`;
-      h += `<td><input id="rt2-${i}" data-r="${i}" data-f="t2" value="${esc(r.t2)}" placeholder="${esc(r.label)}; ${esc(fmt(pv[i],c))}" aria-label="${esc(r.label)} small label" style="min-width:120px"></td>`;
-    } else if (showText) h += `<td><input id="rt-${i}" data-r="${i}" data-f="t" value="${esc(r.t)}" placeholder="auto" aria-label="${esc(r.label)} shown as"></td>`;
-    h += `<td><button class="x" type="button" data-delrow="${i}" aria-label="Remove row ${esc(r.label)}">×</button></td></tr>`;
+      h += `<td><input id="rt-${i}" data-r="${i}" data-f="t" value="${esc(r.t)}" placeholder="${autoPct[i]}%" aria-label="${esc(r.label)} texto grande"></td>`;
+      h += `<td><input id="rt2-${i}" data-r="${i}" data-f="t2" value="${esc(r.t2)}" placeholder="${esc(r.label)}; ${esc(fmt(pv[i],c))}" aria-label="${esc(r.label)} texto pequeno"></td>`;
+    } else if (showText) h += `<td><input id="rt-${i}" data-r="${i}" data-f="t" value="${esc(r.t)}" placeholder="automático" aria-label="${esc(r.label)} texto exibido"></td>`;
+    h += `<td><button class="x" type="button" data-delrow="${i}" aria-label="Apagar linha ${esc(r.label)}" title="Apagar esta linha">×</button></td></tr>`;
   });
   h += '</tbody>';
   tableEl.innerHTML = h;
+  const nCols = c.series.length + (showText ? (isPie ? 2 : 1) : 0);
+  tableEl.style.minWidth = (150 + nCols*68) + 'px';
   const hints = {
-    leaf:'One value per bar. “Shown as” replaces the printed number, e.g. R$ 2.364.',
-    grouped:'Each series becomes a bar inside every group.',
-    capsules:'Up to three layers per column; the largest value is the outer capsule.',
-    pills:'Up to three layers per row; the largest value is the outer pill.',
-    donut:'One value per segment. Only the first series is used.',
-    pie:'One value per slice sets its size. Type in Big label or Small label to replace the automatic text; leave empty to go back to auto.',
-    line:'Rows are points in order. Each series draws one line.',
+    leaf:'Uma linha para cada barra. A altura vem do valor. Para mostrar outro texto no lugar do número (ex.: R$ 2.364), use “Texto exibido”.',
+    grouped:'Cada linha é um grupo. Cada coluna de valores vira uma barra dentro do grupo.',
+    capsules:'Cada linha é uma coluna do gráfico, com até três valores. O maior fica por fora.',
+    pills:'Cada linha é uma barra, com até três valores. O maior fica por fora.',
+    donut:'Uma linha para cada parte do anel.',
+    pie:'Uma linha para cada fatia. O % é calculado sozinho. Para escrever outro texto, use as colunas “Grande” e “Pequeno”; deixe vazio para voltar ao automático.',
+    line:'Cada linha é um ponto, na ordem do tempo. Cada coluna de valores desenha uma linha.',
   };
   document.getElementById('dataHint').textContent = hints[c.type] || '';
   document.getElementById('addSeries').disabled = S >= lim;
@@ -1241,11 +1280,11 @@ document.getElementById('addRow').addEventListener('click', () => {
   const last = tableEl.querySelector(`#rl-${c.rows.length-1}`); last && last.select();
 });
 document.getElementById('addSeries').addEventListener('click', () => {
-  const c = cur(); c.series.push(`Series ${c.series.length+1}`); c.rows.forEach(r => r.v.push('0'));
+  const c = cur(); c.series.push(`Valores ${c.series.length+1}`); c.rows.forEach(r => r.v.push('0'));
   save(); syncAll(); redraw(); refreshChip();
 });
 document.getElementById('pasteBtn').addEventListener('click', () => {
-  const txt = document.getElementById('paste').value.trim(); if (!txt) return toast('Paste some cells first');
+  const txt = document.getElementById('paste').value.trim(); if (!txt) return toast('Cole as células da planilha no campo acima');
   const lines = txt.split(/\r?\n/).filter(l => l.trim());
   const sep = txt.includes('\t') ? '\t' : txt.includes(';') ? ';' : ',';
   const grid = lines.map(l => l.split(sep).map(x => x.trim()));
@@ -1253,11 +1292,11 @@ document.getElementById('pasteBtn').addEventListener('click', () => {
   let head = null;
   if (grid.length > 1 && grid[0].slice(1).length && grid[0].slice(1).every(x => !isNum(x))) head = grid.shift();
   const cols = Math.max(2, ...grid.map(r=>r.length));
-  c.series = head ? head.slice(1) : Array.from({length:cols-1}, (_,i)=>`Series ${i+1}`);
-  while (c.series.length < cols-1) c.series.push(`Series ${c.series.length+1}`);
+  c.series = head ? head.slice(1) : Array.from({length:cols-1}, (_,i)=>`Valores ${i+1}`);
+  while (c.series.length < cols-1) c.series.push(`Valores ${c.series.length+1}`);
   c.rows = grid.map(r => ({ label:r[0] ?? '', v:c.series.map((_,s) => r[s+1] ?? ''), t:'' }));
   c.colors = [];
-  save(); syncAll(); redraw(); refreshChip(); toast(`Loaded ${c.rows.length} rows × ${c.series.length} series`);
+  save(); syncAll(); redraw(); refreshChip(); toast(`Pronto: ${c.rows.length} linhas carregadas`);
 });
 
 /* chart management */
@@ -1291,24 +1330,24 @@ picker.addEventListener('click', e => {
   shelf.scrollLeft = shelf.scrollWidth;
 });
 document.getElementById('dupBtn').addEventListener('click', () => {
-  const c = JSON.parse(JSON.stringify(cur())); c.id = uid(); c.name = (c.name || 'Chart') + ' copy';
+  const c = JSON.parse(JSON.stringify(cur())); c.id = uid(); c.name = (c.name || 'Gráfico') + ' (cópia)';
   const i = state.charts.findIndex(x => x.id === state.current);
-  state.charts.splice(i+1, 0, c); state.current = c.id; save(); buildShelf(); syncAll(); redraw(); toast('Duplicated');
+  state.charts.splice(i+1, 0, c); state.current = c.id; save(); buildShelf(); syncAll(); redraw(); toast('Gráfico duplicado');
 });
 const delBtn = document.getElementById('delBtn'); let delArmed = false, delT;
 delBtn.addEventListener('click', () => {
-  if (!delArmed){ delArmed = true; delBtn.textContent = 'Click again to delete'; clearTimeout(delT); delT = setTimeout(()=>{ delArmed = false; delBtn.textContent = 'Delete chart'; }, 3000); return; }
-  delArmed = false; delBtn.textContent = 'Delete chart';
+  if (!delArmed){ delArmed = true; delBtn.textContent = 'Clique de novo para apagar'; clearTimeout(delT); delT = setTimeout(()=>{ delArmed = false; delBtn.textContent = 'Apagar gráfico'; }, 3000); return; }
+  delArmed = false; delBtn.textContent = 'Apagar gráfico';
   const i = state.charts.findIndex(x => x.id === state.current);
   state.charts.splice(i,1);
   if (!state.charts.length) state.charts.push(fromTemplate(TEMPLATES[0]));
-  state.current = state.charts[Math.max(0,i-1)].id; save(); buildShelf(); syncAll(); redraw(); toast('Chart deleted');
+  state.current = state.charts[Math.max(0,i-1)].id; save(); buildShelf(); syncAll(); redraw(); toast('Gráfico apagado');
 });
 
 /* ---------- export ---------- */
 let dlPromise = null;
 setTimeout(() => { dlPromise = (window.claude && window.claude.use) ? window.claude.use('downloads').catch(()=>null) : Promise.resolve(null); }, 0);
-function exportInfo(){ const c = cur(); document.getElementById('exportInfo').textContent = `${c.w*c.exportScale} × ${c.h*c.exportScale} px PNG${c.bgMode==='none' ? ' with transparent background' : ''}.`; }
+function exportInfo(){ const c = cur(); document.getElementById('exportInfo').textContent = `Imagem de ${c.w*c.exportScale} × ${c.h*c.exportScale} px${c.bgMode==='none' ? ', com fundo transparente' : ''}. Use “Alta” para slides.`; }
 function slug(s){ return (s||'chart').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'-').replace(/^-|-$/g,'').toLowerCase() || 'chart'; }
 async function makeBlob(c){
   await fontsReady(c);
@@ -1319,13 +1358,13 @@ async function makeBlob(c){
 }
 async function exportPNG(){
   const c = cur(); const name = `${slug(c.name)}${c.exportScale>1?'@'+c.exportScale+'x':''}.png`;
-  const blob = await makeBlob(c); if (!blob) return toast('Export failed. Try a smaller size or resolution.');
+  const blob = await makeBlob(c); if (!blob) return toast('Não deu para gerar a imagem. Tente uma qualidade menor.');
   const dl = dlPromise ? await dlPromise : null;
   if (dl){
-    try { const r = await dl.save({ filename:name, data:blob }); if (r && r.status === 'saved') toast(`Saved ${name}`); return; }
+    try { const r = await dl.save({ filename:name, data:blob }); if (r && r.status === 'saved') toast(`Imagem baixada: ${name}`); return; }
     catch(e){
-      if (e && e.code === 'declined') return toast('Export canceled');
-      if (e && e.code === 'rate_limited') return toast('A save prompt is already open');
+      if (e && e.code === 'declined') return toast('Download cancelado');
+      if (e && e.code === 'rate_limited') return toast('Já existe uma janela de download aberta');
     }
   }
   // outside Claude (e.g. GitHub Pages) a normal browser download works
@@ -1334,7 +1373,7 @@ async function exportPNG(){
       const url = URL.createObjectURL(blob), a = document.createElement('a');
       a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
-      return toast(`Saved ${name}`);
+      return toast(`Imagem baixada: ${name}`);
     } catch(e){}
   }
   showFallback(blob);
@@ -1356,8 +1395,8 @@ document.getElementById('copyBtn').addEventListener('click', () => {
   try {
     if (!navigator.clipboard || !window.ClipboardItem) throw new Error();
     navigator.clipboard.write([ new ClipboardItem({ 'image/png': makeBlob(c) }) ])
-      .then(() => toast('Image copied'), () => toast('Copying images isn’t allowed here. Use Export PNG.'));
-  } catch(e){ toast('Copying images isn’t allowed here. Use Export PNG.'); }
+      .then(() => toast('Imagem copiada. Agora é só colar (Ctrl+V) no slide.'), () => toast('Não foi possível copiar aqui. Use “Baixar imagem”.'));
+  } catch(e){ toast('Não foi possível copiar aqui. Use “Baixar imagem”.'); }
 });
 
 document.addEventListener('keydown', e => {
@@ -1369,8 +1408,8 @@ function toast(m){ toastEl.textContent = m; toastEl.hidden = false; clearTimeout
 
 /* ---------- boot ---------- */
 buildShelf(); syncAll(); draw();
-const allFonts = ['Newsreader','Fraunces','Instrument Serif','Gloock'].map(f => `300 40px "${f}"`).concat(['Instrument Sans','DM Sans','Manrope'].flatMap(f => [`400 40px "${f}"`,`600 40px "${f}"`]));
-Promise.all(allFonts.map(f => document.fonts ? document.fonts.load(f).catch(()=>{}) : null)).then(() => { draw(); buildShelf(); });
+const allFonts = ['300 40px "Newsreader"','400 40px "Tenor Sans"','400 40px "DM Sans"','500 40px "DM Sans"','600 40px "DM Sans"'];
+Promise.all(allFonts.map(f => document.fonts ? document.fonts.load(f).catch(()=>{}) : null)).then(() => { draw(); buildShelf(); typesBuilt = false; buildTypes(); });
 if (document.fonts) document.fonts.addEventListener && document.fonts.addEventListener('loadingdone', () => { redraw(); });
 })();
 </script>
